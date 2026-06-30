@@ -1,0 +1,1 @@
+TRANSACTION_TYPES = ("restock", "sell")
