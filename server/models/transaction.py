@@ -19,3 +19,21 @@ class Transaction(db.Model):
     updated_at = db.Column(db.DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
     product_id = db.Column(db.Integer, db.ForeignKey("products.id"), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+
+    __table_args__ = (
+        CheckConstraint('quantity_change != 0', name='check_quantity_change_non_zero'),
+    )
+
+    @validates("transaction_type")
+    def validate_transaction_type(self, key, value):
+        if not isinstance(value, str) or value not in TRANSACTION_TYPES:
+            raise ValueError(f"{key} must be one of {TRANSACTION_TYPES}.")
+        return value
+    
+    @validates("quantity_change")
+    def validate_quantity_change(self, key, value):
+        if not isinstance(value, int):
+            raise ValueError(f"{key} must be an integer.")
+        if value == 0:
+            raise ValueError(f"{key} cannot be zero.")
+        return value
