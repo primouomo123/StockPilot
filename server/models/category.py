@@ -24,3 +24,7 @@ class Category(db.Model):
         if len(stripped_value) < 1 or len(stripped_value) > 50:
             raise ValueError(f"{key} must be between 1 and 50 characters long.")
         return stripped_value
+    
+    user = db.relationship("User", back_populates="categories")
+    products = db.relationship("Product", back_populates="category", cascade="all, delete-orphan", lazy="selectin")
+    transactions = db.relationship("Transaction", back_populates="category", cascade="all, delete-orphan", lazy="selectin")

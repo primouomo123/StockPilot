@@ -72,3 +72,8 @@ class User(db.Model):
             return valid.email
         except EmailNotValidError as e:
             raise ValueError(f"{key} is not a valid email address: {str(e)}")
+    
+
+    categories = db.relationship("Category", back_populates="user", cascade="all, delete-orphan", lazy="selectin")
+    products = db.relationship("Product", back_populates="user", cascade="all, delete-orphan", lazy="selectin")
+    transactions = db.relationship("Transaction", back_populates="user", cascade="all, delete-orphan", lazy="selectin")
