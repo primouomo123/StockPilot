@@ -66,3 +66,7 @@ class Product(db.Model):
         if value < 0:
             raise ValueError(f"{key} must be non-negative.")
         return value
+    
+
+    user = db.relationship("User", back_populates="products")
+    category = db.relationship("Category", back_populates="products")

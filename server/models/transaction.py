@@ -37,3 +37,6 @@ class Transaction(db.Model):
         if value == 0:
             raise ValueError(f"{key} cannot be zero.")
         return value
+    
+    user = db.relationship("User", back_populates="transactions")
+    product = db.relationship("Product", back_populates="transactions")
