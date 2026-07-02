@@ -1,4 +1,3 @@
-import re
 from email_validator import validate_email, EmailNotValidError
 
 from sqlalchemy import CheckConstraint
@@ -7,8 +6,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 from config import db, bcrypt
 
-USERNAME_REGEX = re.compile(r"^[a-z0-9_]+$")
-PASSWORD_REGEX = re.compile(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$")
+from utils import USERNAME_REGEX, PASSWORD_REGEX
 
 class User(db.Model):
     """User model for authentication, authorization, and user management."""

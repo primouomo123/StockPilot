@@ -1,9 +1,6 @@
-import re
-
 from marshmallow import Schema, fields, validate, validates, ValidationError, RAISE, pre_load, post_load
 
-USERNAME_REGEX = re.compile(r"^[a-z0-9_]+$")
-PASSWORD_REGEX = re.compile(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$")
+from utils import USERNAME_REGEX, PASSWORD_REGEX
 
 class UserSchema(Schema):
     """Marshmallow schema for user data validation, serialization and deserialization."""
