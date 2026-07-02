@@ -1,5 +1,4 @@
 import re
-from email_validator import validate_email, EmailNotValidError
 
 from marshmallow import Schema, fields, validate, validates, ValidationError, RAISE, pre_load, post_load
 
