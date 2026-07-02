@@ -8,7 +8,7 @@ class Category(db.Model):
     __tablename__ = "categories"
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), unique=True, nullable=False)
+    name = db.Column(db.String(50), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
 
     __table_args__ = (
@@ -20,7 +20,7 @@ class Category(db.Model):
     def validate_name(self, key, value):
         if not isinstance(value, str):
             raise ValueError(f"{key} must be a string.")
-        stripped_value = value.strip().lower()
+        stripped_value = value.strip().title()
         if len(stripped_value) < 1 or len(stripped_value) > 50:
             raise ValueError(f"{key} must be between 1 and 50 characters long.")
         return stripped_value
