@@ -21,21 +21,24 @@ class Transaction(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
 
     __table_args__ = (
-        CheckConstraint('quantity_change != 0', name='check_quantity_change_non_zero'),
+        CheckConstraint('quantity_change > 0 AND quantity_change <= 1000000', name='check_quantity_change_positive'),
     )
 
     @validates("transaction_type")
     def validate_transaction_type(self, key, value):
-        if not isinstance(value, str) or value not in TRANSACTION_TYPES:
+        if not isinstance(value, str):
+            raise ValueError(f"{key} must be a string.")
+        trimmed_value = value.strip().capitalize()
+        if trimmed_value not in TRANSACTION_TYPES:
             raise ValueError(f"{key} must be one of {TRANSACTION_TYPES}.")
-        return value
+        return trimmed_value
     
     @validates("quantity_change")
     def validate_quantity_change(self, key, value):
         if not isinstance(value, int):
             raise ValueError(f"{key} must be an integer.")
-        if value == 0:
-            raise ValueError(f"{key} cannot be zero.")
+        if value <= 0:
+            raise ValueError(f"{key} must be greater than zero.")
         return value
     
     user = db.relationship("User", back_populates="transactions")
