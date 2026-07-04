@@ -1,7 +1,7 @@
 import re
 
 
-TRANSACTION_TYPES = ("restock", "sell")
+TRANSACTION_TYPES = ("Restock", "Sell")
 
 USERNAME_REGEX = re.compile(r"^[a-z0-9_]+$")
 PASSWORD_REGEX = re.compile(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$")
