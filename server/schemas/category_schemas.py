@@ -3,6 +3,7 @@ from marshmallow import Schema, fields, validate, validates, ValidationError, RA
 class CategorySchema(Schema):
     id = fields.Int(dump_only=True)
     name = fields.Str(required=True, validate=validate.Length(min=1, max=50))
+    user_id = fields.Int(load_only=True, required=True)
 
     class Meta:
         unknown = RAISE
@@ -21,6 +22,7 @@ class CreateCategorySchema(CategorySchema):
         from models import Category  # Importing here to avoid circular import issues
         category = Category(
             name=data['name'],
+            user_id=data['user_id']
         )
         return category
 
