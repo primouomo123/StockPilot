@@ -26,6 +26,12 @@ server/__pycache__/
 server/*.pyc
 server/.pytest_cache/
 server/.mypy_cache/
+server/models/__pycache__/
+server/resources/__pycache__/
+server/utils/__pycache__/
+server/migrations/__pycache__/
+server/migrations/versions/__pycache__/
+server/instance/
 
 # Virtual environments
 server/.venv/
