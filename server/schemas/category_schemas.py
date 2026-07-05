@@ -1,4 +1,4 @@
-from marshmallow import Schema, fields, validate, validates, ValidationError, RAISE, pre_load, post_load
+from marshmallow import Schema, fields, validate, ValidationError, RAISE, pre_load, post_load
 
 class CategorySchema(Schema):
     id = fields.Int(dump_only=True)

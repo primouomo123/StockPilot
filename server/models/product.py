@@ -1,5 +1,4 @@
 from decimal import Decimal, InvalidOperation
-from datetime import datetime
 
 from sqlalchemy import CheckConstraint, UniqueConstraint
 from sqlalchemy.orm import validates

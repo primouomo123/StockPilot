@@ -1,6 +1,4 @@
-from datetime import datetime
-
-from sqlalchemy import CheckConstraint, UniqueConstraint
+from sqlalchemy import CheckConstraint
 from sqlalchemy.orm import validates
 from sqlalchemy.sql import func
 

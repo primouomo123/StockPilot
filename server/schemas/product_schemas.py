@@ -1,6 +1,6 @@
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal
 
-from marshmallow import Schema, fields, validate, validates, validates_schema, ValidationError, RAISE, pre_load, post_load
+from marshmallow import Schema, fields, validate, validates_schema, ValidationError, RAISE, pre_load, post_load
 
 from utils import SKU_REGEX
 
