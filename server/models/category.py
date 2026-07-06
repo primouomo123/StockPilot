@@ -27,4 +27,3 @@ class Category(db.Model):
     
     user = db.relationship("User", back_populates="categories")
     products = db.relationship("Product", back_populates="category", cascade="all, delete-orphan", lazy="selectin")
-    transactions = db.relationship("Transaction", back_populates="category", cascade="all, delete-orphan", lazy="selectin")
