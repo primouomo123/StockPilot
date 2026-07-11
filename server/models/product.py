@@ -19,8 +19,8 @@ class Product(db.Model):
     total_units = db.Column(db.Integer, nullable=False)
     min_stock = db.Column(db.Integer, nullable=False)
     max_stock = db.Column(db.Integer, nullable=False)
-    created_at = db.Column(db.DateTime, server_default=func.now(), nullable=False)
-    updated_at = db.Column(db.DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
+    created_at = db.Column(db.DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_at = db.Column(db.DateTime(timezone=True), server_default=func.now(), nullable=False)
     category_id = db.Column(db.Integer, db.ForeignKey("categories.id"), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
 
