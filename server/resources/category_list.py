@@ -36,13 +36,17 @@ class CategoryList(Resource):
         if request_json is None:
             return {"message": "No input data provided"}, 400
         
+        category_data = {"user_id": user_id}
+
+        if "name" in request_json:
+            category_data["name"] = request_json["name"]
+        
         try:
             create_schema = CreateCategorySchema()
-            request_json['user_id'] = user_id
-            category = create_schema.load(request_json)
+            category = create_schema.load(category_data)
             db.session.add(category)
             db.session.commit()
-            return create_schema.dump(category), 201
+            return CategorySchema().dump(category), 201
         
         except ValidationError as err:
             db.session.rollback()

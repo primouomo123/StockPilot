@@ -34,11 +34,19 @@ class CategoryDetail(Resource):
         request_json = request.get_json()
         if request_json is None:
             return {"message": "No input data provided"}, 400
+        
+        category_data = {}
+
+        if "name" in request_json:
+            category_data["name"] = request_json["name"]
+        
+        if not category_data:
+            return {"message": "No fields provided for update"}, 400
     
         try:
             update_schema = UpdateCategorySchema()
             update_schema.context = {'category': category}
-            updated_category = update_schema.load(request_json)
+            updated_category = update_schema.load(category_data)
             db.session.commit()
             return CategorySchema().dump(updated_category), 200
         
