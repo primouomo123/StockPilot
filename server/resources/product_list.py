@@ -7,6 +7,7 @@ from marshmallow import ValidationError
 
 from models import Product, Category
 from schemas import ProductSchema, CreateProductSchema
+from utils import PRODUCT_CREATION_ALLOWED_KEYS
 from config import db
 
 class ProductList(Resource):
@@ -53,8 +54,7 @@ class ProductList(Resource):
             'total_units': 0
         }
 
-        wanted_keys = {'name', 'sku', 'price', 'total_units', 'min_stock', 'max_stock', 'category_id', 'user_id'}
-        product_data = {key: value for key, value in product_data.items() if key in wanted_keys}        
+        product_data = {key: value for key, value in product_data.items() if key in PRODUCT_CREATION_ALLOWED_KEYS}        
         try:
             create_schema = CreateProductSchema()
             product = create_schema.load(product_data)
