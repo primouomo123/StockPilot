@@ -11,3 +11,4 @@ PRODUCT_CREATION_ALLOWED_KEYS = {'name', 'sku', 'price', 'total_units', 'min_sto
 PRODUCT_UPDATE_ALLOWED_KEYS = {'name', 'sku', 'price', 'min_stock', 'max_stock', 'category_id'}
 CATEGORY_CREATION_ALLOWED_KEYS = {'name', 'user_id'}
 CATEGORY_UPDATE_ALLOWED_KEYS = {'name'}
+USER_ALLOWED_KEYS = {'username', 'email', 'password'}
