@@ -6,3 +6,4 @@ from .me import Me
 from .category_list import CategoryList
 from .category_detail import CategoryDetail
 from .product_list import ProductList
+from .product_detail import ProductDetail
