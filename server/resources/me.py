@@ -4,8 +4,9 @@ from sqlalchemy.exc import IntegrityError
 from flask_jwt_extended import get_jwt_identity, jwt_required, unset_refresh_cookies
 from marshmallow import ValidationError
 
-from models import User
+from models import User, Product
 from schemas import UserSchema, UpdateUserSchema
+from utils import USER_ALLOWED_KEYS
 
 from config import db
 
@@ -38,10 +39,14 @@ class Me(Resource):
         if request_json is None:
             return {"message": "No input data provided"}, 400
         
+        user_data = {key: value for key, value in request_json.items() if key in USER_ALLOWED_KEYS}
+        if not user_data:
+            return {"message": "No valid user data provided"}, 400
+        
         try:
             update_schema = UpdateUserSchema()
             update_schema.context = {'user': user}
-            user = update_schema.load(request_json)
+            user = update_schema.load(user_data)
 
             db.session.commit()
             user_schema = UserSchema()
@@ -67,6 +72,10 @@ class Me(Resource):
         user = db.session.get(User, user_id)
         if not user:
             return {"message": "User not found"}, 404
+        
+        product = db.session.query(Product).filter_by(user_id=user_id).filter(Product.total_units > 0).first()
+        if product:
+            return {"message": "Cannot delete user with active products"}, 400
         
         try:
             db.session.delete(user)

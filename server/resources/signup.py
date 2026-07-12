@@ -6,6 +6,7 @@ from marshmallow import ValidationError
 
 from config import db
 from schemas import CreateUserSchema
+from utils import USER_ALLOWED_KEYS
 
 class Signup(Resource):
     """Resource for user signup."""
@@ -16,9 +17,14 @@ class Signup(Resource):
         if request_json is None:
             return {"message": "No input data provided"}, 400
         
+        user_data = {key: request_json[key] for key in USER_ALLOWED_KEYS if key in request_json}
+
+        if not user_data:
+            return {"message": "No valid user data provided"}, 400
+        
         try:
             schema = CreateUserSchema()
-            user = schema.load(request_json)
+            user = schema.load(user_data)
             db.session.add(user)
             db.session.commit()
 
@@ -36,7 +42,7 @@ class Signup(Resource):
         
         except IntegrityError:
             db.session.rollback()
-            return {"message": "User with this email already exists"}, 400
+            return {"message": "User with this username or email already exists"}, 400
         
         except Exception as e:
             db.session.rollback()
