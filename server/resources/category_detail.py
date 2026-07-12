@@ -71,9 +71,10 @@ class CategoryDetail(Resource):
         if not category:
             return {"message": "Category not found"}, 404
         
-        product = db.session.query(Product).filter_by(category_id=category_id, user_id=user_id).first()
+        product = (db.session.query(Product).filter_by(category_id=category_id, user_id=user_id)
+                   .filter(Product.total_units > 0).first())
         if product:
-            return {"message": "Cannot delete category with associated products."}, 400
+            return {"message": "Cannot delete category with active products."}, 400
         
         try:
             db.session.delete(category)
