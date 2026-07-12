@@ -4,8 +4,9 @@ from sqlalchemy.exc import IntegrityError
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from marshmallow import ValidationError
 
-from models import Category
+from models import Category, Product
 from schemas import CategorySchema, UpdateCategorySchema
+from utils import CATEGORY_UPDATE_ALLOWED_KEYS
 from config import db
 
 class CategoryDetail(Resource):
@@ -35,13 +36,12 @@ class CategoryDetail(Resource):
         if request_json is None:
             return {"message": "No input data provided"}, 400
         
-        category_data = {}
+        category_data = {**request_json}
 
-        if "name" in request_json:
-            category_data["name"] = request_json["name"]
-        
+        category_data = {key: value for key, value in category_data.items() if key in CATEGORY_UPDATE_ALLOWED_KEYS}
+
         if not category_data:
-            return {"message": "No fields provided for update"}, 400
+            return {"message": "No valid fields provided for update"}, 400
     
         try:
             update_schema = UpdateCategorySchema()
@@ -70,6 +70,10 @@ class CategoryDetail(Resource):
         
         if not category:
             return {"message": "Category not found"}, 404
+        
+        product = db.session.query(Product).filter_by(category_id=category_id, user_id=user_id).first()
+        if product:
+            return {"message": "Cannot delete category with associated products."}, 400
         
         try:
             db.session.delete(category)

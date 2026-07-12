@@ -6,6 +6,7 @@ from marshmallow import ValidationError
 
 from models import Category
 from schemas import CategorySchema, CreateCategorySchema
+from utils import CATEGORY_CREATION_ALLOWED_KEYS
 from config import db
 
 class CategoryList(Resource):
@@ -36,10 +37,11 @@ class CategoryList(Resource):
         if request_json is None:
             return {"message": "No input data provided"}, 400
         
-        category_data = {"user_id": user_id}
+        category_data = {**request_json,
+                         "user_id": user_id
+                         }
 
-        if "name" in request_json:
-            category_data["name"] = request_json["name"]
+        category_data = {key: value for key, value in category_data.items() if key in CATEGORY_CREATION_ALLOWED_KEYS}
         
         try:
             create_schema = CreateCategorySchema()
