@@ -4,10 +4,10 @@ from utils import TRANSACTION_TYPES
 
 class TransactionSchema(Schema):
     id = fields.Int(dump_only=True)
-    transaction_type = fields.Str(required=True, validate=validate.OneOf(TRANSACTION_TYPES))
-    quantity_change = fields.Int(required=True, validate=validate.Range(min=1, max=1000000))
+    transaction_type = fields.Str(required=True, validate=validate.OneOf(TRANSACTION_TYPES,
+                                                                         error="Invalid transaction type. Must be one of: 'Purchase', 'Sale', 'Return'"))
+    quantity_change = fields.Int(required=True)
     created_at = fields.DateTime(dump_only=True)
-    updated_at = fields.DateTime(dump_only=True)
     product_id = fields.Int(load_only=True, required=True)
     product_name = fields.Str(attribute='product.name', dump_only=True)
     user_id = fields.Int(load_only=True, required=True)
@@ -22,6 +22,13 @@ class TransactionSchema(Schema):
         if 'transaction_type' in data and isinstance(data['transaction_type'], str):
             data['transaction_type'] = data['transaction_type'].strip().capitalize()
         return data
+    
+    @validates('quantity_change')
+    def validate_quantity_change(self, value):
+        if not isinstance(value, int):
+            raise ValidationError("Quantity change must be an integer.")
+        if value < -1000000 or value > 1000000 or value == 0:
+            raise ValidationError("Quantity change must be between -1,000,000 and 1,000,000, excluding zero.")
 
 
 class CreateTransactionSchema(TransactionSchema):
@@ -35,33 +42,4 @@ class CreateTransactionSchema(TransactionSchema):
             product_id=data['product_id'],
             user_id=data['user_id']
         )
-        return transaction
-
-
-class UpdateTransactionSchema(TransactionSchema):
-    """Schema for updating an existing transaction."""
-    transaction_type = fields.Str(
-        required=False,
-        validate=validate.OneOf(TRANSACTION_TYPES)
-    )
-    quantity_change = fields.Int(
-        required=False,
-        validate=validate.Range(min=1, max=1000000)
-    )
-    product_id = fields.Int(
-        load_only=True,
-        required=False
-    )
-    user_id = fields.Int(
-        load_only=True,
-        required=False
-    )
-
-    @post_load
-    def update_transaction(self, data, **kwargs):
-        transaction = self.context.get('transaction')
-        if not transaction:
-            raise ValidationError("Transaction instance is required in context for updating.")
-        for key, value in data.items():
-            setattr(transaction, key, value)
         return transaction

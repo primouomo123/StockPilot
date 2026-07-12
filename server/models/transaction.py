@@ -13,13 +13,12 @@ class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     transaction_type = db.Column(db.Enum(*TRANSACTION_TYPES, name="transaction_types"), nullable=False)
     quantity_change = db.Column(db.Integer, nullable=False)
-    created_at = db.Column(db.DateTime, server_default=func.now(), nullable=False)
-    updated_at = db.Column(db.DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
+    created_at = db.Column(db.DateTime(timezone=True), server_default=func.now(), nullable=False)
     product_id = db.Column(db.Integer, db.ForeignKey("products.id"), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
 
     __table_args__ = (
-        CheckConstraint('quantity_change > 0 AND quantity_change <= 1000000', name='check_quantity_change_positive'),
+        CheckConstraint('(quantity_change >= -1000000 AND quantity_change <0) OR (quantity_change > 0 AND quantity_change <= 1000000)', name='check_quantity_change_range'),
     )
 
     @validates("transaction_type")
@@ -35,8 +34,8 @@ class Transaction(db.Model):
     def validate_quantity_change(self, key, value):
         if not isinstance(value, int):
             raise ValueError(f"{key} must be an integer.")
-        if value <= 0:
-            raise ValueError(f"{key} must be greater than zero.")
+        if (value < -1000000 or value > 1000000 or value == 0):
+            raise ValueError(f"{key} must be between -1,000,000 and 1,000,000, excluding zero.")
         return value
     
     user = db.relationship("User", back_populates="transactions")
