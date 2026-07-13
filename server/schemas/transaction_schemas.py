@@ -5,7 +5,7 @@ from utils import TRANSACTION_TYPES
 class TransactionSchema(Schema):
     id = fields.Int(dump_only=True)
     transaction_type = fields.Str(required=True, validate=validate.OneOf(TRANSACTION_TYPES,
-                                                                         error="Invalid transaction type. Must be one of: 'Purchase', 'Sale', 'Return'"))
+                                                                         error=f"Invalid transaction type. Must be one of: {TRANSACTION_TYPES}."))
     quantity_change = fields.Int(required=True)
     created_at = fields.DateTime(dump_only=True)
     product_id = fields.Int(load_only=True, required=True)
@@ -20,15 +20,25 @@ class TransactionSchema(Schema):
     def process_input(self, data, **kwargs):
         # Strip whitespace from string fields
         if 'transaction_type' in data and isinstance(data['transaction_type'], str):
-            data['transaction_type'] = data['transaction_type'].strip().capitalize()
+            data['transaction_type'] = data['transaction_type'].strip().title()
         return data
     
     @validates('quantity_change')
     def validate_quantity_change(self, value):
         if not isinstance(value, int):
             raise ValidationError("Quantity change must be an integer.")
-        if value < -1000000 or value > 1000000 or value == 0:
-            raise ValidationError("Quantity change must be between -1,000,000 and 1,000,000, excluding zero.")
+        if value == 0:
+            raise ValidationError("Quantity change must be non-zero.")
+    
+    @validates_schema
+    def validate_transaction_type_and_quantity(self, data, **kwargs):
+        transaction_type = data.get('transaction_type')
+        quantity_change = data.get('quantity_change')
+
+        if transaction_type == TRANSACTION_TYPES[0] and quantity_change <= 0:
+            raise ValidationError("For Stock_In transactions, quantity change must be a positive integer.")
+        elif transaction_type == TRANSACTION_TYPES[1] and quantity_change >= 0:
+            raise ValidationError("For Stock_Out transactions, quantity change must be a negative integer.")
 
 
 class CreateTransactionSchema(TransactionSchema):

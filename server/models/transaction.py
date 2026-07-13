@@ -18,14 +18,14 @@ class Transaction(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
 
     __table_args__ = (
-        CheckConstraint('(quantity_change >= -1000000 AND quantity_change <0) OR (quantity_change > 0 AND quantity_change <= 1000000)', name='check_quantity_change_range'),
+        CheckConstraint('quantity_change != 0', name='check_quantity_change_non_zero'),
     )
 
     @validates("transaction_type")
     def validate_transaction_type(self, key, value):
         if not isinstance(value, str):
             raise ValueError(f"{key} must be a string.")
-        trimmed_value = value.strip().capitalize()
+        trimmed_value = value.strip().title()
         if trimmed_value not in TRANSACTION_TYPES:
             raise ValueError(f"{key} must be one of {TRANSACTION_TYPES}.")
         return trimmed_value
@@ -34,8 +34,8 @@ class Transaction(db.Model):
     def validate_quantity_change(self, key, value):
         if not isinstance(value, int):
             raise ValueError(f"{key} must be an integer.")
-        if (value < -1000000 or value > 1000000 or value == 0):
-            raise ValueError(f"{key} must be between -1,000,000 and 1,000,000, excluding zero.")
+        if (value == 0):
+            raise ValueError(f"{key} must be non-zero.")
         return value
     
     user = db.relationship("User", back_populates="transactions")
