@@ -33,58 +33,80 @@ with app.app_context():
 
     print("Seeding products...")
     # Electronics (category1, user1)
-    product1 = Product(name='Wireless Headphones', sku='ELEC-WH-001', price=79.99, total_units=50, min_stock=5, max_stock=100, category_id=category1.id, user_id=user1.id)
-    product2 = Product(name='Bluetooth Speaker', sku='ELEC-BS-002', price=49.99, total_units=30, min_stock=5, max_stock=80, category_id=category1.id, user_id=user1.id)
-    product3 = Product(name='USB-C Hub', sku='ELEC-HUB-003', price=34.99, total_units=75, min_stock=10, max_stock=150, category_id=category1.id, user_id=user1.id)
+    product1 = Product(name='Wireless Headphones', sku='ELEC-WH-001', price=79.99, total_units=0, min_stock=5, max_stock=100, category_id=category1.id, user_id=user1.id)
+    product2 = Product(name='Bluetooth Speaker', sku='ELEC-BS-002', price=49.99, total_units=0, min_stock=5, max_stock=80, category_id=category1.id, user_id=user1.id)
+    product3 = Product(name='USB-C Hub', sku='ELEC-HUB-003', price=34.99, total_units=0, min_stock=10, max_stock=150, category_id=category1.id, user_id=user1.id)
     # Books (category2, user1)
-    product4 = Product(name='Python Programming Guide', sku='BOOK-PY-001', price=29.99, total_units=40, min_stock=5, max_stock=100, category_id=category2.id, user_id=user1.id)
-    product5 = Product(name='Clean Code', sku='BOOK-CC-002', price=24.99, total_units=25, min_stock=5, max_stock=60, category_id=category2.id, user_id=user1.id)
+    product4 = Product(name='Python Programming Guide', sku='BOOK-PY-001', price=29.99, total_units=0, min_stock=5, max_stock=100, category_id=category2.id, user_id=user1.id)
+    product5 = Product(name='Clean Code', sku='BOOK-CC-002', price=24.99, total_units=0, min_stock=5, max_stock=60, category_id=category2.id, user_id=user1.id)
     # Clothing (category3, user1)
-    product6 = Product(name='Cotton T-Shirt', sku='CLTH-TS-001', price=19.99, total_units=100, min_stock=10, max_stock=200, category_id=category3.id, user_id=user1.id)
-    product7 = Product(name='Denim Jeans', sku='CLTH-DJ-002', price=59.99, total_units=60, min_stock=5, max_stock=120, category_id=category3.id, user_id=user1.id)
+    product6 = Product(name='Cotton T-Shirt', sku='CLTH-TS-001', price=19.99, total_units=0, min_stock=10, max_stock=200, category_id=category3.id, user_id=user1.id)
+    product7 = Product(name='Denim Jeans', sku='CLTH-DJ-002', price=59.99, total_units=0, min_stock=5, max_stock=120, category_id=category3.id, user_id=user1.id)
     # Home & Kitchen (category4, user1)
-    product8 = Product(name='Stainless Steel Kettle', sku='HOME-KT-001', price=44.99, total_units=35, min_stock=5, max_stock=70, category_id=category4.id, user_id=user1.id)
-    product9 = Product(name='Non-Stick Pan Set', sku='HOME-PAN-002', price=89.99, total_units=20, min_stock=3, max_stock=50, category_id=category4.id, user_id=user1.id)
+    product8 = Product(name='Stainless Steel Kettle', sku='HOME-KT-001', price=44.99, total_units=0, min_stock=5, max_stock=70, category_id=category4.id, user_id=user1.id)
+    product9 = Product(name='Non-Stick Pan Set', sku='HOME-PAN-002', price=89.99, total_units=0, min_stock=3, max_stock=50, category_id=category4.id, user_id=user1.id)
     # Sports & Outdoors (category5, user2)
-    product10 = Product(name='Yoga Mat', sku='SPRT-YM-001', price=29.99, total_units=45, min_stock=5, max_stock=90, category_id=category5.id, user_id=user2.id)
-    product11 = Product(name='Resistance Bands Set', sku='SPRT-RB-002', price=19.99, total_units=80, min_stock=10, max_stock=160, category_id=category5.id, user_id=user2.id)
+    product10 = Product(name='Yoga Mat', sku='SPRT-YM-001', price=29.99, total_units=0, min_stock=5, max_stock=90, category_id=category5.id, user_id=user2.id)
+    product11 = Product(name='Resistance Bands Set', sku='SPRT-RB-002', price=19.99, total_units=0, min_stock=10, max_stock=160, category_id=category5.id, user_id=user2.id)
     # Toys & Games (category6, user2)
-    product12 = Product(name='Chess Set', sku='TOYS-CS-001', price=34.99, total_units=25, min_stock=3, max_stock=60, category_id=category6.id, user_id=user2.id)
-    product13 = Product(name='Building Blocks 200Pc', sku='TOYS-BB-002', price=24.99, total_units=55, min_stock=5, max_stock=100, category_id=category6.id, user_id=user2.id)
+    product12 = Product(name='Chess Set', sku='TOYS-CS-001', price=34.99, total_units=0, min_stock=3, max_stock=60, category_id=category6.id, user_id=user2.id)
+    product13 = Product(name='Building Blocks 200Pc', sku='TOYS-BB-002', price=24.99, total_units=0, min_stock=5, max_stock=100, category_id=category6.id, user_id=user2.id)
     # Health & Personal Care (category7, user2)
-    product14 = Product(name='Electric Toothbrush', sku='HLTH-ETB-001', price=54.99, total_units=30, min_stock=5, max_stock=70, category_id=category7.id, user_id=user2.id)
-    product15 = Product(name='Vitamin C Supplements', sku='HLTH-VTC-002', price=14.99, total_units=120, min_stock=15, max_stock=250, category_id=category7.id, user_id=user2.id)
+    product14 = Product(name='Electric Toothbrush', sku='HLTH-ETB-001', price=54.99, total_units=0, min_stock=5, max_stock=70, category_id=category7.id, user_id=user2.id)
+    product15 = Product(name='Vitamin C Supplements', sku='HLTH-VTC-002', price=14.99, total_units=0, min_stock=15, max_stock=250, category_id=category7.id, user_id=user2.id)
     # Automotive (category8, user2)
-    product16 = Product(name='Car Phone Mount', sku='AUTO-PM-001', price=19.99, total_units=65, min_stock=10, max_stock=130, category_id=category8.id, user_id=user2.id)
-    product17 = Product(name='Tire Pressure Gauge', sku='AUTO-TPG-002', price=12.99, total_units=90, min_stock=10, max_stock=180, category_id=category8.id, user_id=user2.id)
+    product16 = Product(name='Car Phone Mount', sku='AUTO-PM-001', price=19.99, total_units=0, min_stock=10, max_stock=130, category_id=category8.id, user_id=user2.id)
+    product17 = Product(name='Tire Pressure Gauge', sku='AUTO-TPG-002', price=12.99, total_units=0, min_stock=10, max_stock=180, category_id=category8.id, user_id=user2.id)
     db.session.add_all([product1, product2, product3, product4, product5, product6, product7, product8, product9, product10, product11, product12, product13, product14, product15, product16, product17])
     db.session.commit()
 
     print("Seeding transactions...")
     # user1 transactions
-    transaction1 = Transaction(transaction_type='Restock', quantity_change=20, product_id=product1.id, user_id=user1.id)
-    transaction2 = Transaction(transaction_type='Sell', quantity_change=5, product_id=product1.id, user_id=user1.id)
-    transaction3 = Transaction(transaction_type='Restock', quantity_change=15, product_id=product2.id, user_id=user1.id)
-    transaction4 = Transaction(transaction_type='Sell', quantity_change=3, product_id=product2.id, user_id=user1.id)
-    transaction5 = Transaction(transaction_type='Restock', quantity_change=30, product_id=product3.id, user_id=user1.id)
-    transaction6 = Transaction(transaction_type='Sell', quantity_change=10, product_id=product4.id, user_id=user1.id)
-    transaction7 = Transaction(transaction_type='Restock', quantity_change=12, product_id=product5.id, user_id=user1.id)
-    transaction8 = Transaction(transaction_type='Sell', quantity_change=8, product_id=product6.id, user_id=user1.id)
-    transaction9 = Transaction(transaction_type='Restock', quantity_change=25, product_id=product7.id, user_id=user1.id)
-    transaction10 = Transaction(transaction_type='Sell', quantity_change=4, product_id=product8.id, user_id=user1.id)
-    transaction11 = Transaction(transaction_type='Restock', quantity_change=10, product_id=product9.id, user_id=user1.id)
+    transaction1 = Transaction(transaction_type='Stock In', quantity_change=20, product_id=product1.id, user_id=user1.id)
+    product1.total_units += 20
+    transaction2 = Transaction(transaction_type='Stock Out', quantity_change=-5, product_id=product1.id, user_id=user1.id)
+    product1.total_units += -5
+    transaction3 = Transaction(transaction_type='Stock In', quantity_change=15, product_id=product2.id, user_id=user1.id)
+    product2.total_units += 15
+    transaction4 = Transaction(transaction_type='Stock Out', quantity_change=-3, product_id=product2.id, user_id=user1.id)
+    product2.total_units += -3
+    transaction5 = Transaction(transaction_type='Stock In', quantity_change=30, product_id=product3.id, user_id=user1.id)
+    product3.total_units += 30
+    transaction6 = Transaction(transaction_type='Stock In', quantity_change=10, product_id=product4.id, user_id=user1.id)
+    product4.total_units += 10
+    transaction7 = Transaction(transaction_type='Stock In', quantity_change=12, product_id=product5.id, user_id=user1.id)
+    product5.total_units += 12
+    transaction8 = Transaction(transaction_type='Stock In', quantity_change=8, product_id=product6.id, user_id=user1.id)
+    product6.total_units += 8
+    transaction9 = Transaction(transaction_type='Stock In', quantity_change=25, product_id=product7.id, user_id=user1.id)
+    product7.total_units += 25
+    transaction10 = Transaction(transaction_type='Stock In', quantity_change=4, product_id=product8.id, user_id=user1.id)
+    product8.total_units += 4
+    transaction11 = Transaction(transaction_type='Stock In', quantity_change=10, product_id=product9.id, user_id=user1.id)
+    product9.total_units += 10
     # user2 transactions
-    transaction12 = Transaction(transaction_type='Restock', quantity_change=20, product_id=product10.id, user_id=user2.id)
-    transaction13 = Transaction(transaction_type='Sell', quantity_change=6, product_id=product10.id, user_id=user2.id)
-    transaction14 = Transaction(transaction_type='Restock', quantity_change=40, product_id=product11.id, user_id=user2.id)
-    transaction15 = Transaction(transaction_type='Sell', quantity_change=7, product_id=product11.id, user_id=user2.id)
-    transaction16 = Transaction(transaction_type='Restock', quantity_change=10, product_id=product12.id, user_id=user2.id)
-    transaction17 = Transaction(transaction_type='Sell', quantity_change=2, product_id=product12.id, user_id=user2.id)
-    transaction18 = Transaction(transaction_type='Restock', quantity_change=25, product_id=product13.id, user_id=user2.id)
-    transaction19 = Transaction(transaction_type='Sell', quantity_change=5, product_id=product14.id, user_id=user2.id)
-    transaction20 = Transaction(transaction_type='Restock', quantity_change=50, product_id=product15.id, user_id=user2.id)
-    transaction21 = Transaction(transaction_type='Sell', quantity_change=9, product_id=product16.id, user_id=user2.id)
-    transaction22 = Transaction(transaction_type='Restock', quantity_change=30, product_id=product17.id, user_id=user2.id)
+    transaction12 = Transaction(transaction_type='Stock In', quantity_change=20, product_id=product10.id, user_id=user2.id)
+    product10.total_units += 20
+    transaction13 = Transaction(transaction_type='Stock Out', quantity_change=-6, product_id=product10.id, user_id=user2.id)
+    product10.total_units += -6
+    transaction14 = Transaction(transaction_type='Stock In', quantity_change=40, product_id=product11.id, user_id=user2.id)
+    product11.total_units += 40
+    transaction15 = Transaction(transaction_type='Stock Out', quantity_change=-7, product_id=product11.id, user_id=user2.id)
+    product11.total_units += -7
+    transaction16 = Transaction(transaction_type='Stock In', quantity_change=10, product_id=product12.id, user_id=user2.id)
+    product12.total_units += 10
+    transaction17 = Transaction(transaction_type='Stock Out', quantity_change=-2, product_id=product12.id, user_id=user2.id)
+    product12.total_units += -2
+    transaction18 = Transaction(transaction_type='Stock In', quantity_change=25, product_id=product13.id, user_id=user2.id)
+    product13.total_units += 25
+    transaction19 = Transaction(transaction_type='Stock In', quantity_change=5, product_id=product14.id, user_id=user2.id)
+    product14.total_units += 5
+    transaction20 = Transaction(transaction_type='Stock In', quantity_change=50, product_id=product15.id, user_id=user2.id)
+    product15.total_units += 50
+    transaction21 = Transaction(transaction_type='Stock In', quantity_change=9, product_id=product16.id, user_id=user2.id)
+    product16.total_units += 9
+    transaction22 = Transaction(transaction_type='Stock In', quantity_change=30, product_id=product17.id, user_id=user2.id)
+    product17.total_units += 30
     db.session.add_all([transaction1, transaction2, transaction3, transaction4, transaction5, transaction6, transaction7, transaction8, transaction9, transaction10, transaction11, transaction12, transaction13, transaction14, transaction15, transaction16, transaction17, transaction18, transaction19, transaction20, transaction21, transaction22])
     db.session.commit()
 
