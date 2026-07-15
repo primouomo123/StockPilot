@@ -19,6 +19,7 @@ class ProductList(Resource):
         page = request.args.get('page', 1, type=int)
         per_page = request.args.get('per_page', 20, type=int)
         name_filter = request.args.get('name', type=str)
+        sku_filter = request.args.get('sku', type=str)
         user_id = get_jwt_identity()
         query = (db.session.query(Product)
                  .options(selectinload(Product.category))  # Eager load the category relationship
@@ -27,6 +28,10 @@ class ProductList(Resource):
         # Apply optional case-insensitive name filter.
         if isinstance(name_filter, str) and name_filter.strip():
             query = query.filter(Product.name.ilike(f"%{name_filter.strip()}%"))
+
+        # Apply optional exact SKU filter.
+        if isinstance(sku_filter, str) and sku_filter.strip():
+            query = query.filter(Product.sku == sku_filter.strip().upper())
 
         pagination = query.paginate(page=page, per_page=per_page, error_out=False)
         
