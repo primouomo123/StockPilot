@@ -18,11 +18,17 @@ class ProductList(Resource):
         """Retrieve a list of all products."""
         page = request.args.get('page', 1, type=int)
         per_page = request.args.get('per_page', 20, type=int)
+        name_filter = request.args.get('name', type=str)
         user_id = get_jwt_identity()
-        pagination = (db.session.query(Product)
-                      .options(selectinload(Product.category))  # Eager load the category relationship
-                      .filter_by(user_id=user_id)
-                      .paginate(page=page, per_page=per_page, error_out=False))
+        query = (db.session.query(Product)
+                 .options(selectinload(Product.category))  # Eager load the category relationship
+                 .filter_by(user_id=user_id))
+
+        # Apply optional case-insensitive name filter.
+        if isinstance(name_filter, str) and name_filter.strip():
+            query = query.filter(Product.name.ilike(f"%{name_filter.strip()}%"))
+
+        pagination = query.paginate(page=page, per_page=per_page, error_out=False)
         
         return {
             'page': pagination.page,

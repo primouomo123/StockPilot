@@ -17,9 +17,15 @@ class CategoryList(Resource):
         """Retrieve a list of all categories."""
         page = request.args.get('page', 1, type=int)
         per_page = request.args.get('per_page', 20, type=int)
+        name_filter = request.args.get('name', type=str)
         user_id = get_jwt_identity()
-        pagination = (db.session.query(Category).filter_by(user_id=user_id)
-                      .paginate(page=page, per_page=per_page, error_out=False))
+        query = db.session.query(Category).filter_by(user_id=user_id)
+
+        # Apply optional case-insensitive name filter.
+        if isinstance(name_filter, str) and name_filter.strip():
+            query = query.filter(Category.name.ilike(f"%{name_filter.strip().title()}%"))
+
+        pagination = query.paginate(page=page, per_page=per_page, error_out=False)
         
         return {
             'page': pagination.page,
