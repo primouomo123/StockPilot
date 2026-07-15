@@ -16,6 +16,19 @@ def check_if_logged_in():
             return make_response(jsonify({'error': '401 Unauthorized'}), 401)
 
 
+api.add_resource(Signup, '/signup')
+api.add_resource(Login, '/login')
+api.add_resource(TokenRefresh, '/refresh')
+api.add_resource(Logout, '/logout')
+api.add_resource(Me, '/me')
+api.add_resource(CategoryList, '/categories')
+api.add_resource(CategoryDetail, '/categories/<int:category_id>')
+api.add_resource(ProductList, '/products')
+api.add_resource(ProductDetail, '/products/<int:product_id>')
+api.add_resource(TransactionList, '/transactions')
+api.add_resource(TransactionDetail, '/transactions/<int:transaction_id>')
+api.add_resource(Summary, '/summary')
+
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
