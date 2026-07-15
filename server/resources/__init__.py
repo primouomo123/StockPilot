@@ -9,3 +9,4 @@ from .product_list import ProductList
 from .product_detail import ProductDetail
 from .transaction_list import TransactionList
 from .transaction_detail import TransactionDetail
+from .summary import Summary
