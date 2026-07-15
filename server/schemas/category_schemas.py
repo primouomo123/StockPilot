@@ -31,6 +31,16 @@ class CreateCategorySchema(CategorySchema):
 
 class UpdateCategorySchema(CategorySchema):
     """Schema for updating an existing category."""
+    name = fields.Str(
+        required=False,
+        validate=validate.Length(
+            min=1,
+            max=50,
+            error="Name must be between 1 and 50 characters long"
+        )
+    )
+    user_id = fields.Int(load_only=True, required=False)
+
     @post_load
     def update_category(self, data, **kwargs):
         category = self.context.get('category')

@@ -24,7 +24,7 @@ class TransactionSchema(Schema):
         return data
     
     @validates('quantity_change')
-    def validate_quantity_change(self, value):
+    def validate_quantity_change(self, value, **kwargs):
         if not isinstance(value, int):
             raise ValidationError("Quantity change must be an integer.")
         if value == 0:

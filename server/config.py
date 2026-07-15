@@ -1,5 +1,6 @@
 import os
 from datetime import timedelta
+from decimal import Decimal
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -28,7 +29,7 @@ def parse_origins(raw_origins):
 
 app = Flask(__name__)
 app.config["JWT_SECRET_KEY"] = os.getenv("SECRET_KEY")
-app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=15)
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=1)
 app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=30)
 app.config["JWT_TOKEN_LOCATION"] = ["headers", "cookies"]
 app.config["JWT_COOKIE_SECURE"] = env_flag("JWT_COOKIE_SECURE", default=False)
@@ -37,6 +38,9 @@ app.config["JWT_COOKIE_CSRF_PROTECT"] = env_flag("JWT_COOKIE_CSRF_PROTECT", defa
 app.config["JWT_REFRESH_COOKIE_PATH"] = "/api/refresh"
 app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URI") or os.getenv("DATABASE_URL")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config["RESTFUL_JSON"] = {
+    "default": lambda value: float(value) if isinstance(value, Decimal) else None
+}
 app.json.compact = False
 
 # CORS origins are configurable for deployment and default to local frontend hosts.

@@ -36,7 +36,9 @@ class CategoryDetail(Resource):
         if request_json is None:
             return {"message": "No input data provided"}, 400
         
-        category_data = {**request_json}
+        category_data = {**request_json,
+                         "user_id": user_id,
+                         }
 
         category_data = {key: value for key, value in category_data.items() if key in CATEGORY_UPDATE_ALLOWED_KEYS}
 

@@ -1,8 +1,8 @@
 """Initial migration.
 
-Revision ID: 873681cbc9d7
+Revision ID: 0b4ee8f0c330
 Revises: 
-Create Date: 2026-07-04 21:32:09.042990
+Create Date: 2026-07-15 14:25:40.885941
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '873681cbc9d7'
+revision = '0b4ee8f0c330'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -47,8 +47,8 @@ def upgrade():
     sa.Column('total_units', sa.Integer(), nullable=False),
     sa.Column('min_stock', sa.Integer(), nullable=False),
     sa.Column('max_stock', sa.Integer(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
     sa.Column('category_id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.CheckConstraint('length(name) >= 1', name='check_name_min_length'),
@@ -66,13 +66,12 @@ def upgrade():
     )
     op.create_table('transactions',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('transaction_type', sa.Enum('Restock', 'Sell', name='transaction_types'), nullable=False),
+    sa.Column('transaction_type', sa.Enum('Stock In', 'Stock Out', name='transaction_types'), nullable=False),
     sa.Column('quantity_change', sa.Integer(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
     sa.Column('product_id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
-    sa.CheckConstraint('quantity_change > 0 AND quantity_change <= 1000000', name='check_quantity_change_positive'),
+    sa.CheckConstraint('quantity_change != 0', name='check_quantity_change_non_zero'),
     sa.ForeignKeyConstraint(['product_id'], ['products.id'], name=op.f('fk_transactions_product_id_products')),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], name=op.f('fk_transactions_user_id_users')),
     sa.PrimaryKeyConstraint('id')

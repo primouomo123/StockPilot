@@ -91,6 +91,11 @@ class UpdateProductSchema(ProductSchema):
         validate=validate.Range(min=Decimal('0.01'),
                                 error="Price must be at least 0.01")
     )
+    total_units = fields.Int(
+        required=False,
+        validate=validate.Range(min=0,
+                                error="Total units must be 0 or greater")
+    )
     min_stock = fields.Int(
         required=False,
         validate=validate.Range(min=0,

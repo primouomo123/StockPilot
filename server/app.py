@@ -7,9 +7,9 @@ from resources import *
 
 @app.before_request
 def check_if_logged_in():
-    open_access_list = ['signup', 'login', 'refresh', 'logout']
+    open_access_paths = {'/api/signup', '/api/login', '/api/refresh', '/api/logout'}
 
-    if request.endpoint and request.endpoint not in open_access_list:
+    if request.path not in open_access_paths:
         try:
             verify_jwt_in_request()
         except Exception as e:
