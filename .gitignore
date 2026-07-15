@@ -32,6 +32,7 @@ server/utils/__pycache__/
 server/migrations/__pycache__/
 server/migrations/versions/__pycache__/
 server/instance/
+server/schemas/__pycache__/
 
 # Virtual environments
 server/.venv/
