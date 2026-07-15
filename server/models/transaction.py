@@ -13,20 +13,19 @@ class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     transaction_type = db.Column(db.Enum(*TRANSACTION_TYPES, name="transaction_types"), nullable=False)
     quantity_change = db.Column(db.Integer, nullable=False)
-    created_at = db.Column(db.DateTime, server_default=func.now(), nullable=False)
-    updated_at = db.Column(db.DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
+    created_at = db.Column(db.DateTime(timezone=True), server_default=func.now(), nullable=False)
     product_id = db.Column(db.Integer, db.ForeignKey("products.id"), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
 
     __table_args__ = (
-        CheckConstraint('quantity_change > 0 AND quantity_change <= 1000000', name='check_quantity_change_positive'),
+        CheckConstraint('quantity_change != 0', name='check_quantity_change_non_zero'),
     )
 
     @validates("transaction_type")
     def validate_transaction_type(self, key, value):
         if not isinstance(value, str):
             raise ValueError(f"{key} must be a string.")
-        trimmed_value = value.strip().capitalize()
+        trimmed_value = value.strip().title()
         if trimmed_value not in TRANSACTION_TYPES:
             raise ValueError(f"{key} must be one of {TRANSACTION_TYPES}.")
         return trimmed_value
@@ -35,8 +34,8 @@ class Transaction(db.Model):
     def validate_quantity_change(self, key, value):
         if not isinstance(value, int):
             raise ValueError(f"{key} must be an integer.")
-        if value <= 0:
-            raise ValueError(f"{key} must be greater than zero.")
+        if (value == 0):
+            raise ValueError(f"{key} must be non-zero.")
         return value
     
     user = db.relationship("User", back_populates="transactions")

@@ -2,7 +2,9 @@ from marshmallow import Schema, fields, validate, ValidationError, RAISE, pre_lo
 
 class CategorySchema(Schema):
     id = fields.Int(dump_only=True)
-    name = fields.Str(required=True, validate=validate.Length(min=1, max=50))
+    name = fields.Str(required=True, validate=validate.Length(min=1,
+                                                              max=50,
+                                                              error="Name must be between 1 and 50 characters long"))
     user_id = fields.Int(load_only=True, required=True)
 
     class Meta:
