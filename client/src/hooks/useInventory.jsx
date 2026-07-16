@@ -1,17 +1,19 @@
 import { useCallback, useState } from "react";
 import api from "../api/api";
 
+const INITIAL_PAGINATION = {
+	page: 1,
+	perPage: 20,
+	total: 0,
+	totalPages: 0,
+	hasNext: false,
+	hasPrev: false,
+};
+
 export default function useInventory() {
 	const [products, setProducts] = useState([]);
 	const [pendingRequests, setPendingRequests] = useState(0);
-	const [pagination, setPagination] = useState({
-		page: 1,
-		perPage: 20,
-		total: 0,
-		totalPages: 0,
-		hasNext: false,
-		hasPrev: false,
-	});
+	const [pagination, setPagination] = useState(INITIAL_PAGINATION);
 	const [error, setError] = useState(null);
 	const isLoading = pendingRequests > 0;
 
@@ -167,6 +169,12 @@ export default function useInventory() {
 		}
 	}, [endRequest, parseError, startRequest]);
 
+	const clearProductsState = useCallback(() => {
+		setProducts([]);
+		setPagination(INITIAL_PAGINATION);
+		setError(null);
+	}, []);
+
 	return {
 		products,
 		pagination,
@@ -176,6 +184,7 @@ export default function useInventory() {
 		createProduct,
 		updateProduct,
 		deleteProduct,
+		clearProductsState,
 	};
 }
 

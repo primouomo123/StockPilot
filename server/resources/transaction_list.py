@@ -4,6 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import selectinload
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from marshmallow import ValidationError
+from datetime import datetime, timedelta
 
 from models import Transaction, Product
 from schemas import TransactionSchema, CreateTransactionSchema
@@ -19,11 +20,40 @@ class TransactionList(Resource):
         """Get all transactions for the current user."""
         page = request.args.get('page', 1, type=int)
         per_page = request.args.get('per_page', 20, type=int)
+        start_date = request.args.get('start_date', type=str)
+        end_date = request.args.get('end_date', type=str)
         user_id = get_jwt_identity()
-        pagination = (db.session.query(Transaction)
-                      .options(selectinload(Transaction.product))  # Eager load the product relationship
-                      .filter_by(user_id=user_id)
-                      .paginate(page=page, per_page=per_page, error_out=False))
+
+        query = (db.session.query(Transaction)
+                 .options(selectinload(Transaction.product))  # Eager load the product relationship
+                 .filter_by(user_id=user_id))
+
+        parsed_start_date = None
+        parsed_end_date = None
+
+        if isinstance(start_date, str) and start_date.strip():
+            try:
+                parsed_start_date = datetime.strptime(start_date.strip(), "%Y-%m-%d")
+            except ValueError:
+                return {"message": "start_date must be in YYYY-MM-DD format"}, 400
+
+        if isinstance(end_date, str) and end_date.strip():
+            try:
+                parsed_end_date = datetime.strptime(end_date.strip(), "%Y-%m-%d")
+            except ValueError:
+                return {"message": "end_date must be in YYYY-MM-DD format"}, 400
+
+        if parsed_start_date and parsed_end_date and parsed_start_date > parsed_end_date:
+            return {"message": "start_date cannot be after end_date"}, 400
+
+        if parsed_start_date:
+            query = query.filter(Transaction.created_at >= parsed_start_date)
+
+        if parsed_end_date:
+            next_day = parsed_end_date + timedelta(days=1)
+            query = query.filter(Transaction.created_at < next_day)
+
+        pagination = query.paginate(page=page, per_page=per_page, error_out=False)
         
         return {
             'page': pagination.page,

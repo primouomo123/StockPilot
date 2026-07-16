@@ -1,17 +1,19 @@
 import { useCallback, useState } from "react";
 import api from "../api/api";
 
+const INITIAL_PAGINATION = {
+	page: 1,
+	perPage: 20,
+	total: 0,
+	totalPages: 0,
+	hasNext: false,
+	hasPrev: false,
+};
+
 export default function useTransactions() {
 	const [transactions, setTransactions] = useState([]);
 	const [pendingRequests, setPendingRequests] = useState(0);
-	const [pagination, setPagination] = useState({
-		page: 1,
-		perPage: 20,
-		total: 0,
-		totalPages: 0,
-		hasNext: false,
-		hasPrev: false,
-	});
+	const [pagination, setPagination] = useState(INITIAL_PAGINATION);
 	const [error, setError] = useState(null);
 	const isLoading = pendingRequests > 0;
 
@@ -54,15 +56,20 @@ export default function useTransactions() {
 		});
 	}, []);
 
-	const getTransactions = useCallback(async ({ page = 1, perPage = 20 } = {}) => {
+	const getTransactions = useCallback(async ({ page = 1, perPage = 20, startDate, endDate } = {}) => {
 		startRequest();
 
 		try {
+			const params = {
+				page,
+				per_page: perPage,
+			};
+
+			if (startDate) params.start_date = startDate;
+			if (endDate) params.end_date = endDate;
+
 			const res = await api.get("/transactions", {
-				params: {
-					page,
-					per_page: perPage,
-				},
+				params,
 			});
 
 			const data = res.data ?? {};
@@ -122,6 +129,12 @@ export default function useTransactions() {
 		}
 	}, [endRequest, parseError, startRequest]);
 
+	const clearTransactionsState = useCallback(() => {
+		setTransactions([]);
+		setPagination(INITIAL_PAGINATION);
+		setError(null);
+	}, []);
+
 	return {
 		transactions,
 		pagination,
@@ -130,5 +143,6 @@ export default function useTransactions() {
 		getTransactions,
 		getTransactionById,
 		createTransaction,
+		clearTransactionsState,
 	};
 }

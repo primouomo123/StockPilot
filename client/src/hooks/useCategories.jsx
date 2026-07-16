@@ -2,16 +2,18 @@ import { useCallback, useState } from "react";
 import api from "../api/api";
 
 export default function useCategories() {
-  const [categories, setCategories] = useState([]);
-  const [pendingRequests, setPendingRequests] = useState(0);
-  const [pagination, setPagination] = useState({
+  const initialPagination = {
     page: 1,
     perPage: 20,
     total: 0,
     totalPages: 0,
     hasNext: false,
     hasPrev: false,
-  });
+  };
+
+  const [categories, setCategories] = useState([]);
+  const [pendingRequests, setPendingRequests] = useState(0);
+  const [pagination, setPagination] = useState(initialPagination);
   const [error, setError] = useState(null);
   const isLoading = pendingRequests > 0;
 
@@ -164,6 +166,12 @@ export default function useCategories() {
     }
   }, [endRequest, parseError, startRequest]);
 
+  const clearCategoriesState = useCallback(() => {
+    setCategories([]);
+    setPagination(initialPagination);
+    setError(null);
+  }, []);
+
   return {
     categories,
     pagination,
@@ -173,5 +181,6 @@ export default function useCategories() {
     createCategory,
     updateCategory,
     deleteCategory,
+    clearCategoriesState,
   };
 }
