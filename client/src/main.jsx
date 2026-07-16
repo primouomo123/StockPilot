@@ -6,15 +6,18 @@ import { ThemeProvider } from './contexts/ThemeContext.jsx'
 import { UserProvider } from './contexts/UserContext.jsx'
 import { CategoryProvider } from './contexts/CategoryContext.jsx'
 import { ProductProvider } from './contexts/ProductContext.jsx'
+import { TransactionProvider } from './contexts/TransactionContext.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <UserProvider>
       <CategoryProvider>
         <ProductProvider>
-          <ThemeProvider>
-            <App />
-          </ThemeProvider>
+          <TransactionProvider>
+            <ThemeProvider>
+              <App />
+            </ThemeProvider>
+          </TransactionProvider>
         </ProductProvider>
       </CategoryProvider>
     </UserProvider>
