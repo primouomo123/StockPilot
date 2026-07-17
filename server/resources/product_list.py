@@ -33,6 +33,9 @@ class ProductList(Resource):
         if isinstance(sku_filter, str) and sku_filter.strip():
             query = query.filter(Product.sku == sku_filter.strip().upper())
 
+        # Newest products first.
+        query = query.order_by(Product.created_at.desc(), Product.id.desc())
+
         pagination = query.paginate(page=page, per_page=per_page, error_out=False)
         
         return {
