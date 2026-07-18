@@ -174,7 +174,8 @@ export default function Transactions() {
                     p: { xs: 2, md: 3 },
                     border: 1,
                     borderColor: "divider",
-                    background: "linear-gradient(135deg, rgba(2,136,209,0.10) 0%, rgba(255,255,255,1) 65%)",
+                    backgroundColor: (theme) =>
+                        theme.palette.mode === "dark" ? "rgba(2,136,209,0.18)" : "rgba(2,136,209,0.10)",
                 }}
             >
                 <Stack

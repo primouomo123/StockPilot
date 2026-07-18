@@ -35,7 +35,8 @@ export default function TransactionsGrid({
                         <TableRow
                             sx={{
                                 "& .MuiTableCell-root": {
-                                    bgcolor: "grey.100",
+                                    bgcolor: (theme) =>
+                                        theme.palette.mode === "dark" ? "rgba(2,136,209,0.20)" : "grey.100",
                                     fontWeight: 700,
                                     letterSpacing: "0.02em",
                                 },
@@ -73,7 +74,10 @@ export default function TransactionsGrid({
                                     hover
                                     sx={{
                                         "&:nth-of-type(even)": {
-                                            backgroundColor: "rgba(0, 0, 0, 0.01)",
+                                            backgroundColor: (theme) =>
+                                                theme.palette.mode === "dark"
+                                                    ? "rgba(255, 255, 255, 0.03)"
+                                                    : "rgba(0, 0, 0, 0.01)",
                                         },
                                     }}
                                 >

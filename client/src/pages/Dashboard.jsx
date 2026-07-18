@@ -262,7 +262,8 @@ export default function Dashboard() {
                     border: 1,
                     borderColor: "divider",
                     borderRadius: 2,
-                    background: "linear-gradient(135deg, rgba(2,136,209,0.10) 0%, rgba(255,255,255,1) 65%)",
+                    backgroundColor: (theme) =>
+                        theme.palette.mode === "dark" ? "rgba(2,136,209,0.18)" : "rgba(2,136,209,0.10)",
                 }}
             >
                 <Stack spacing={2}>
@@ -405,7 +406,15 @@ export default function Dashboard() {
                     <TableContainer>
                     <Table size="small">
                         <TableHead>
-                            <TableRow sx={{ "& .MuiTableCell-root": { fontWeight: 700, bgcolor: "grey.100" } }}>
+                            <TableRow
+                                sx={{
+                                    "& .MuiTableCell-root": {
+                                        fontWeight: 700,
+                                        bgcolor: (theme) =>
+                                            theme.palette.mode === "dark" ? "rgba(2,136,209,0.20)" : "grey.100",
+                                    },
+                                }}
+                            >
                                 <TableCell>Name</TableCell>
                                 <TableCell>SKU</TableCell>
                                 <TableCell>Category</TableCell>
@@ -424,7 +433,14 @@ export default function Dashboard() {
                                     <TableRow
                                         key={product.id}
                                         hover
-                                        sx={{ "&:nth-of-type(even)": { backgroundColor: "rgba(0, 0, 0, 0.015)" } }}
+                                        sx={{
+                                            "&:nth-of-type(even)": {
+                                                backgroundColor: (theme) =>
+                                                    theme.palette.mode === "dark"
+                                                        ? "rgba(255, 255, 255, 0.03)"
+                                                        : "rgba(0, 0, 0, 0.015)",
+                                            },
+                                        }}
                                     >
                                         <TableCell>{product.name}</TableCell>
                                         <TableCell>{product.sku}</TableCell>
@@ -448,7 +464,15 @@ export default function Dashboard() {
                     <TableContainer>
                     <Table size="small">
                         <TableHead>
-                            <TableRow sx={{ "& .MuiTableCell-root": { fontWeight: 700, bgcolor: "grey.100" } }}>
+                            <TableRow
+                                sx={{
+                                    "& .MuiTableCell-root": {
+                                        fontWeight: 700,
+                                        bgcolor: (theme) =>
+                                            theme.palette.mode === "dark" ? "rgba(2,136,209,0.20)" : "grey.100",
+                                    },
+                                }}
+                            >
                                 <TableCell>Product</TableCell>
                                 <TableCell>Type</TableCell>
                                 <TableCell align="right">Quantity</TableCell>
@@ -472,7 +496,14 @@ export default function Dashboard() {
                                         <TableRow
                                             key={transaction.id}
                                             hover
-                                            sx={{ "&:nth-of-type(even)": { backgroundColor: "rgba(0, 0, 0, 0.015)" } }}
+                                            sx={{
+                                                "&:nth-of-type(even)": {
+                                                    backgroundColor: (theme) =>
+                                                        theme.palette.mode === "dark"
+                                                            ? "rgba(255, 255, 255, 0.03)"
+                                                            : "rgba(0, 0, 0, 0.015)",
+                                                },
+                                            }}
                                         >
                                             <TableCell>{transaction.product_name}</TableCell>
                                             <TableCell>

@@ -141,7 +141,8 @@ export default function Categories() {
                     p: { xs: 2, md: 3 },
                     border: 1,
                     borderColor: "divider",
-                    background: "linear-gradient(135deg, rgba(25,118,210,0.08) 0%, rgba(255,255,255,1) 65%)",
+                    backgroundColor: (theme) =>
+                        theme.palette.mode === "dark" ? "rgba(2,136,209,0.18)" : "rgba(2,136,209,0.10)",
                 }}
             >
                 <Stack
