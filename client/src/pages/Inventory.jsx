@@ -102,8 +102,8 @@ export default function Inventory() {
             return { error: "Price must be greater than 0." };
         }
 
-        if (Number.isNaN(minStock) || minStock < 0 || Number.isNaN(maxStock) || maxStock < 0) {
-            return { error: "Min stock and max stock must be 0 or greater." };
+        if (Number.isNaN(minStock) || minStock <= 0 || Number.isNaN(maxStock) || maxStock <= 0) {
+            return { error: "Min stock and max stock must be greater than 0." };
         }
 
         if (minStock > maxStock) {

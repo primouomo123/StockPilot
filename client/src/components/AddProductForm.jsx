@@ -7,6 +7,28 @@ export default function AddProductForm({
     categoryOptions,
     disabled,
 }) {
+    const handlePositiveDecimalChange = (field, value) => {
+        if (value === "") {
+            onFieldChange(field, value);
+            return;
+        }
+
+        const number = Number(value);
+        if (Number.isNaN(number) || number < 0) return;
+        onFieldChange(field, value);
+    };
+
+    const handlePositiveIntegerChange = (field, value) => {
+        if (value === "") {
+            onFieldChange(field, value);
+            return;
+        }
+
+        const number = Number(value);
+        if (Number.isNaN(number) || number < 0 || !Number.isInteger(number)) return;
+        onFieldChange(field, value);
+    };
+
     return (
         <Paper sx={{ p: { xs: 2, md: 2.5 }, flex: 1 }}>
             <Stack spacing={1.5}>
@@ -43,25 +65,25 @@ export default function AddProductForm({
                         inputProps={{ min: 0.01, step: "0.01" }}
                         sx={{ minWidth: { sm: 120 } }}
                         value={product.price}
-                        onChange={(event) => onFieldChange("price", event.target.value)}
+                        onChange={(event) => handlePositiveDecimalChange("price", event.target.value)}
                         disabled={disabled}
                     />
                     <TextField
                         label="Min stock"
                         type="number"
-                        inputProps={{ min: 0, step: 1 }}
+                        inputProps={{ min: 1, step: 1 }}
                         sx={{ minWidth: { sm: 120 } }}
                         value={product.minStock}
-                        onChange={(event) => onFieldChange("minStock", event.target.value)}
+                        onChange={(event) => handlePositiveIntegerChange("minStock", event.target.value)}
                         disabled={disabled}
                     />
                     <TextField
                         label="Max stock"
                         type="number"
-                        inputProps={{ min: 0, step: 1 }}
+                        inputProps={{ min: 1, step: 1 }}
                         sx={{ minWidth: { sm: 120 } }}
                         value={product.maxStock}
-                        onChange={(event) => onFieldChange("maxStock", event.target.value)}
+                        onChange={(event) => handlePositiveIntegerChange("maxStock", event.target.value)}
                         disabled={disabled}
                     />
                     <TextField

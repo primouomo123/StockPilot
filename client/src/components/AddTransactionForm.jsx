@@ -1,5 +1,5 @@
 import { AddRounded } from "@mui/icons-material";
-import { Button, MenuItem, Paper, Stack, TextField, Typography } from "@mui/material";
+import { Autocomplete, Button, MenuItem, Paper, Stack, TextField, Typography } from "@mui/material";
 
 export default function AddTransactionForm({
     transaction,
@@ -9,6 +9,17 @@ export default function AddTransactionForm({
     onSubmit,
     disabled,
 }) {
+    const handlePositiveIntegerChange = (value) => {
+        if (value === "") {
+            onFieldChange("quantityChange", value);
+            return;
+        }
+
+        const number = Number(value);
+        if (Number.isNaN(number) || number < 0 || !Number.isInteger(number)) return;
+        onFieldChange("quantityChange", value);
+    };
+
     return (
         <Paper sx={{ p: { xs: 2, md: 2.5 } }}>
             <Stack spacing={1.5}>
@@ -25,20 +36,14 @@ export default function AddTransactionForm({
                     useFlexGap
                     flexWrap="wrap"
                 >
-                    <TextField
-                        select
-                        label="Product"
+                    <Autocomplete
+                        options={productOptions}
                         sx={{ minWidth: { sm: 240 } }}
-                        value={transaction.productName}
-                        onChange={(event) => onFieldChange("productName", event.target.value)}
+                        value={transaction.productName || null}
+                        onChange={(_, nextValue) => onFieldChange("productName", nextValue || "")}
                         disabled={disabled || productOptions.length === 0}
-                    >
-                        {productOptions.map((name) => (
-                            <MenuItem key={name} value={name}>
-                                {name}
-                            </MenuItem>
-                        ))}
-                    </TextField>
+                        renderInput={(params) => <TextField {...params} label="Product" />}
+                    />
 
                     <TextField
                         select
@@ -61,7 +66,7 @@ export default function AddTransactionForm({
                         inputProps={{ min: 1, step: 1 }}
                         sx={{ minWidth: { sm: 140 } }}
                         value={transaction.quantityChange}
-                        onChange={(event) => onFieldChange("quantityChange", event.target.value)}
+                        onChange={(event) => handlePositiveIntegerChange(event.target.value)}
                         disabled={disabled}
                     />
 

@@ -42,6 +42,28 @@ export default function ProductsGrid({
     onPrevPage,
     onNextPage,
 }) {
+    const handlePositiveDecimalChange = (field, value) => {
+        if (value === "") {
+            onEditingProductFieldChange(field, value);
+            return;
+        }
+
+        const number = Number(value);
+        if (Number.isNaN(number) || number < 0) return;
+        onEditingProductFieldChange(field, value);
+    };
+
+    const handlePositiveIntegerChange = (field, value) => {
+        if (value === "") {
+            onEditingProductFieldChange(field, value);
+            return;
+        }
+
+        const number = Number(value);
+        if (Number.isNaN(number) || number < 0 || !Number.isInteger(number)) return;
+        onEditingProductFieldChange(field, value);
+    };
+
     return (
         <>
             <Paper sx={{ overflow: "hidden" }}>
@@ -154,7 +176,7 @@ export default function ProductsGrid({
                                                     inputProps={{ min: 0.01, step: "0.01" }}
                                                     value={editingProduct.price}
                                                     onChange={(event) =>
-                                                        onEditingProductFieldChange("price", event.target.value)
+                                                        handlePositiveDecimalChange("price", event.target.value)
                                                     }
                                                     disabled={productsIsLoading}
                                                 />
@@ -169,20 +191,20 @@ export default function ProductsGrid({
                                                     <TextField
                                                         size="small"
                                                         type="number"
-                                                        inputProps={{ min: 0, step: 1 }}
+                                                        inputProps={{ min: 1, step: 1 }}
                                                         value={editingProduct.minStock}
                                                         onChange={(event) =>
-                                                            onEditingProductFieldChange("minStock", event.target.value)
+                                                            handlePositiveIntegerChange("minStock", event.target.value)
                                                         }
                                                         disabled={productsIsLoading}
                                                     />
                                                     <TextField
                                                         size="small"
                                                         type="number"
-                                                        inputProps={{ min: 0, step: 1 }}
+                                                        inputProps={{ min: 1, step: 1 }}
                                                         value={editingProduct.maxStock}
                                                         onChange={(event) =>
-                                                            onEditingProductFieldChange("maxStock", event.target.value)
+                                                            handlePositiveIntegerChange("maxStock", event.target.value)
                                                         }
                                                         disabled={productsIsLoading}
                                                     />

@@ -199,8 +199,8 @@ export default function Dashboard() {
             return { error: "Price must be greater than 0." };
         }
 
-        if (Number.isNaN(minStock) || minStock < 0 || Number.isNaN(maxStock) || maxStock < 0) {
-            return { error: "Min stock and max stock must be 0 or greater." };
+        if (Number.isNaN(minStock) || minStock <= 0 || Number.isNaN(maxStock) || maxStock <= 0) {
+            return { error: "Min stock and max stock must be greater than 0." };
         }
 
         if (minStock > maxStock) {
@@ -561,27 +561,49 @@ export default function Dashboard() {
                             inputProps={{ min: 0.01, step: "0.01" }}
                             value={editingProduct.price}
                             onChange={(event) => {
-                                setEditingProduct((current) => ({ ...current, price: event.target.value }));
+                                const nextValue = event.target.value;
+                                if (nextValue !== "") {
+                                    const numericValue = Number(nextValue);
+                                    if (Number.isNaN(numericValue) || numericValue < 0) return;
+                                }
+
+                                setEditingProduct((current) => ({ ...current, price: nextValue }));
                                 setLocalError(null);
                             }}
                         />
                         <TextField
                             label="Min stock"
                             type="number"
-                            inputProps={{ min: 0, step: 1 }}
+                            inputProps={{ min: 1, step: 1 }}
                             value={editingProduct.minStock}
                             onChange={(event) => {
-                                setEditingProduct((current) => ({ ...current, minStock: event.target.value }));
+                                const nextValue = event.target.value;
+                                if (nextValue !== "") {
+                                    const numericValue = Number(nextValue);
+                                    if (Number.isNaN(numericValue) || numericValue < 0 || !Number.isInteger(numericValue)) {
+                                        return;
+                                    }
+                                }
+
+                                setEditingProduct((current) => ({ ...current, minStock: nextValue }));
                                 setLocalError(null);
                             }}
                         />
                         <TextField
                             label="Max stock"
                             type="number"
-                            inputProps={{ min: 0, step: 1 }}
+                            inputProps={{ min: 1, step: 1 }}
                             value={editingProduct.maxStock}
                             onChange={(event) => {
-                                setEditingProduct((current) => ({ ...current, maxStock: event.target.value }));
+                                const nextValue = event.target.value;
+                                if (nextValue !== "") {
+                                    const numericValue = Number(nextValue);
+                                    if (Number.isNaN(numericValue) || numericValue < 0 || !Number.isInteger(numericValue)) {
+                                        return;
+                                    }
+                                }
+
+                                setEditingProduct((current) => ({ ...current, maxStock: nextValue }));
                                 setLocalError(null);
                             }}
                         />
