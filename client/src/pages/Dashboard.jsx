@@ -90,53 +90,113 @@ function ProductListCard({ title, products, emptyMessage, severity = "default", 
         success: "success",
     };
 
+    const helperTextMap = {
+        error: "Products that are fully depleted and need immediate replenishment.",
+        warning: "Products that have fallen below their required minimum stock.",
+        success: "Products that are approaching their minimum threshold.",
+        default: "Products grouped by current stock condition.",
+    };
+
     return (
-        <Paper sx={{ p: 2.5, border: 1, borderColor: "divider", borderRadius: 2, height: "100%" }}>
-            <Stack spacing={1.5}>
-                <Stack direction="row" alignItems="center" justifyContent="space-between">
-                    <Typography variant="h6">{title}</Typography>
-                    <Chip size="small" label={`${products.length}`} color={colorMap[severity]} />
+        <Paper
+            sx={{
+                p: 2.5,
+                border: 1,
+                borderColor: "divider",
+                borderRadius: 2,
+                height: "100%",
+            }}
+        >
+            <Stack spacing={2}>
+                <Stack spacing={1}>
+                    <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
+                        <Typography variant="h6">{title}</Typography>
+                        <Chip size="small" label={`${products.length} items`} color={colorMap[severity]} />
+                    </Stack>
+                    <Typography variant="body2" color="text.secondary">
+                        {helperTextMap[severity]}
+                    </Typography>
                 </Stack>
 
                 {products.length === 0 ? (
-                    <Typography color="text.secondary">{emptyMessage}</Typography>
+                    <Paper
+                        variant="outlined"
+                        sx={{
+                            px: 2,
+                            py: 2.5,
+                            borderRadius: 2,
+                            bgcolor: "background.default",
+                        }}
+                    >
+                        <Typography color="text.secondary">{emptyMessage}</Typography>
+                    </Paper>
                 ) : (
-                    <Stack spacing={1}>
+                    <Stack spacing={1.25}>
                         {products.map((product) => (
                             <Paper
                                 key={product.id}
                                 variant="outlined"
                                 sx={{
-                                    p: 1.25,
-                                    display: "flex",
-                                    justifyContent: "space-between",
-                                    alignItems: "center",
+                                    p: 1.5,
                                     borderRadius: 2,
                                     transition: "background-color 120ms ease",
                                     "&:hover": { backgroundColor: "action.hover" },
                                 }}
                             >
-                                <Box>
-                                    <Typography fontWeight={600}>{product.name}</Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        SKU: {product.sku}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Min / Max: {product.min_stock} / {product.max_stock}
-                                    </Typography>
-                                </Box>
-                                <Stack spacing={1} alignItems="flex-end">
-                                    <Typography fontWeight={700}>{product.total_units} u</Typography>
-                                    {onEdit ? (
-                                        <Button
-                                            size="small"
-                                            variant="outlined"
-                                            startIcon={<EditRounded />}
-                                            onClick={() => onEdit(product)}
-                                        >
-                                            Edit
-                                        </Button>
-                                    ) : null}
+                                <Stack
+                                    direction={{ xs: "column", sm: "row" }}
+                                    spacing={1.5}
+                                    alignItems={{ xs: "flex-start", sm: "center" }}
+                                    justifyContent="space-between"
+                                >
+                                    <Stack spacing={1} sx={{ minWidth: 0 }}>
+                                        <Box>
+                                            <Typography fontWeight={700} noWrap>
+                                                {product.name}
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary">
+                                                SKU: {product.sku}
+                                            </Typography>
+                                        </Box>
+
+                                        <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                                            {product.category_name ? (
+                                                <Chip size="small" label={product.category_name} variant="outlined" />
+                                            ) : null}
+                                            <Chip
+                                                size="small"
+                                                label={`Min ${product.min_stock} / Max ${product.max_stock}`}
+                                                variant="outlined"
+                                            />
+                                        </Stack>
+                                    </Stack>
+
+                                    <Stack
+                                        direction={{ xs: "row", sm: "column" }}
+                                        spacing={1.25}
+                                        alignItems={{ xs: "center", sm: "flex-end" }}
+                                        justifyContent="space-between"
+                                        sx={{ width: { xs: "100%", sm: "auto" } }}
+                                    >
+                                        <Box sx={{ textAlign: { xs: "left", sm: "right" } }}>
+                                            <Typography variant="caption" color="text.secondary">
+                                                Current units
+                                            </Typography>
+                                            <Typography variant="h6" fontWeight={700}>
+                                                {product.total_units}
+                                            </Typography>
+                                        </Box>
+                                        {onEdit ? (
+                                            <Button
+                                                size="small"
+                                                variant="outlined"
+                                                startIcon={<EditRounded />}
+                                                onClick={() => onEdit(product)}
+                                            >
+                                                Edit
+                                            </Button>
+                                        ) : null}
+                                    </Stack>
                                 </Stack>
                             </Paper>
                         ))}
