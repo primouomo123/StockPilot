@@ -7,6 +7,7 @@ import {
     Alert,
     Box,
     Button,
+    Chip,
     CircularProgress,
     Paper,
     Stack,
@@ -160,12 +161,36 @@ export default function Me() {
 
     return (
         <Stack spacing={3}>
-            <Stack spacing={0.5}>
-                <Typography variant="h4">My Account</Typography>
-                <Typography color="text.secondary">
-                    Enter your current password to confirm any profile changes.
-                </Typography>
-            </Stack>
+            <Paper
+                elevation={0}
+                sx={{
+                    p: { xs: 2, md: 3 },
+                    border: 1,
+                    borderColor: "divider",
+                    background:
+                        "linear-gradient(135deg, rgba(2,136,209,0.10) 0%, rgba(255,255,255,1) 65%)",
+                }}
+            >
+                <Stack
+                    direction={{ xs: "column", md: "row" }}
+                    spacing={1.5}
+                    alignItems={{ xs: "flex-start", md: "center" }}
+                    justifyContent="space-between"
+                >
+                    <Box>
+                        <Typography variant="h4">My Account</Typography>
+                        <Typography color="text.secondary">
+                            Manage profile details and password security settings.
+                        </Typography>
+                    </Box>
+                    <Stack direction="row" spacing={1}>
+                        {currentUser?.username && (
+                            <Chip label={`@${currentUser.username}`} variant="outlined" color="primary" />
+                        )}
+                        <Chip label="Security required" variant="outlined" />
+                    </Stack>
+                </Stack>
+            </Paper>
 
             {(localError || authError) && (
                 <Alert severity="error">{localError || authError}</Alert>
@@ -177,26 +202,44 @@ export default function Me() {
 
             <Paper sx={{ p: { xs: 2, md: 3 } }}>
                 <Stack component="form" spacing={2} onSubmit={handleSubmit} noValidate>
-                    <TextField
-                        label="Username"
-                        name="username"
-                        value={formData.username}
-                        onChange={handleChange}
-                        autoComplete="username"
-                        disabled={authIsLoading}
-                        required
-                    />
+                    <Stack spacing={1}>
+                        <Typography variant="h6">Profile details</Typography>
+                        <Typography variant="body2" color="text.secondary">
+                            Update your public account information.
+                        </Typography>
+                    </Stack>
 
-                    <TextField
-                        label="Email"
-                        name="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        autoComplete="email"
-                        disabled={authIsLoading}
-                        required
-                    />
+                    <Stack direction={{ xs: "column", md: "row" }} spacing={1.5}>
+                        <TextField
+                            fullWidth
+                            label="Username"
+                            name="username"
+                            value={formData.username}
+                            onChange={handleChange}
+                            autoComplete="username"
+                            disabled={authIsLoading}
+                            required
+                        />
+
+                        <TextField
+                            fullWidth
+                            label="Email"
+                            name="email"
+                            type="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            autoComplete="email"
+                            disabled={authIsLoading}
+                            required
+                        />
+                    </Stack>
+
+                    <Stack spacing={1} sx={{ pt: 1 }}>
+                        <Typography variant="h6">Security</Typography>
+                        <Typography variant="body2" color="text.secondary">
+                            Enter your current password to confirm any profile update.
+                        </Typography>
+                    </Stack>
 
                     <TextField
                         label="Current password"
@@ -209,31 +252,35 @@ export default function Me() {
                         required
                     />
 
-                    <TextField
-                        label="New password (optional)"
-                        name="password"
-                        type="password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        autoComplete="new-password"
-                        disabled={authIsLoading}
-                    />
+                    <Stack direction={{ xs: "column", md: "row" }} spacing={1.5}>
+                        <TextField
+                            fullWidth
+                            label="New password (optional)"
+                            name="password"
+                            type="password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            autoComplete="new-password"
+                            disabled={authIsLoading}
+                        />
 
-                    <TextField
-                        label="Confirm new password"
-                        name="confirmPassword"
-                        type="password"
-                        value={formData.confirmPassword}
-                        onChange={handleChange}
-                        autoComplete="new-password"
-                        disabled={authIsLoading}
-                    />
+                        <TextField
+                            fullWidth
+                            label="Confirm new password"
+                            name="confirmPassword"
+                            type="password"
+                            value={formData.confirmPassword}
+                            onChange={handleChange}
+                            autoComplete="new-password"
+                            disabled={authIsLoading}
+                        />
+                    </Stack>
 
                     <Typography variant="body2" color="text.secondary">
                         Account created: {accountCreatedAt}
                     </Typography>
 
-                    <Stack direction="row" spacing={1.5}>
+                    <Stack direction="row" spacing={1.5} justifyContent="flex-end">
                         <Button type="submit" variant="contained" disabled={authIsLoading}>
                             {authIsLoading ? "Saving..." : "Save changes"}
                         </Button>
@@ -241,7 +288,14 @@ export default function Me() {
                 </Stack>
             </Paper>
 
-            <Paper sx={{ p: { xs: 2, md: 3 }, border: 1, borderColor: "error.main" }}>
+            <Paper
+                sx={{
+                    p: { xs: 2, md: 3 },
+                    border: 1,
+                    borderColor: "error.main",
+                    backgroundColor: "rgba(211,47,47,0.03)",
+                }}
+            >
                 <Stack spacing={1.5}>
                     <Typography variant="h6" color="error.main">
                         Danger zone
