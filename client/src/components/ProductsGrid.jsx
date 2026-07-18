@@ -65,7 +65,7 @@ export default function ProductsGrid({
                             <TableCell>Units</TableCell>
                             <TableCell>Min / Max</TableCell>
                             <TableCell>Category</TableCell>
-                            <TableCell width="20%" align="right">Actions</TableCell>
+                            <TableCell width="20%" align="left" sx={{ pl: 4 }}>Actions</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -256,6 +256,12 @@ export default function ProductsGrid({
                                                                 color="error"
                                                                 onClick={() => onDelete(product.id, product.name)}
                                                                 disabled={productsIsLoading || product.total_units > 0}
+                                                                sx={{
+                                                                    "&.Mui-disabled": {
+                                                                        color: "error.main",
+                                                                        opacity: 0.65,
+                                                                    },
+                                                                }}
                                                             >
                                                                 <DeleteRounded />
                                                             </IconButton>
