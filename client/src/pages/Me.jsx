@@ -31,6 +31,7 @@ export default function Me() {
     const [formData, setFormData] = useState({
         username: "",
         email: "",
+        currentPassword: "",
         password: "",
         confirmPassword: "",
     });
@@ -81,6 +82,7 @@ export default function Me() {
 
         const username = formData.username.trim();
         const email = formData.email.trim();
+        const currentPassword = formData.currentPassword;
         const password = formData.password;
         const confirmPassword = formData.confirmPassword;
 
@@ -94,9 +96,25 @@ export default function Me() {
             return;
         }
 
+        const hasProfileChanges =
+            username !== (currentUser?.username ?? "") ||
+            email !== (currentUser?.email ?? "") ||
+            Boolean(password);
+
+        if (!hasProfileChanges) {
+            setLocalError("No profile changes to save.");
+            return;
+        }
+
+        if (!currentPassword) {
+            setLocalError("Current password is required to save profile changes.");
+            return;
+        }
+
         const payload = {
             username,
             email,
+            current_password: currentPassword,
         };
 
         if (password) {
@@ -107,6 +125,7 @@ export default function Me() {
             await updateMe(payload);
             setFormData((current) => ({
                 ...current,
+                currentPassword: "",
                 password: "",
                 confirmPassword: "",
             }));
@@ -144,7 +163,7 @@ export default function Me() {
             <Stack spacing={0.5}>
                 <Typography variant="h4">My Account</Typography>
                 <Typography color="text.secondary">
-                    Update your profile details and optionally change your password.
+                    Enter your current password to confirm any profile changes.
                 </Typography>
             </Stack>
 
@@ -175,6 +194,17 @@ export default function Me() {
                         value={formData.email}
                         onChange={handleChange}
                         autoComplete="email"
+                        disabled={authIsLoading}
+                        required
+                    />
+
+                    <TextField
+                        label="Current password"
+                        name="currentPassword"
+                        type="password"
+                        value={formData.currentPassword}
+                        onChange={handleChange}
+                        autoComplete="current-password"
                         disabled={authIsLoading}
                         required
                     />

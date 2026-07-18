@@ -38,6 +38,13 @@ class Me(Resource):
         request_json = request.get_json()
         if request_json is None:
             return {"message": "No input data provided"}, 400
+
+        current_password = request_json.get("current_password")
+        if not isinstance(current_password, str) or not current_password:
+            return {"message": "Current password is required"}, 400
+
+        if not user.authenticate(current_password):
+            return {"message": "Current password is incorrect"}, 401
         
         user_data = {key: value for key, value in request_json.items() if key in USER_ALLOWED_KEYS}
         if not user_data:
