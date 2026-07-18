@@ -5,31 +5,15 @@
 import { useEffect, useMemo, useState } from "react";
 import {
     Alert,
-    Button,
-    CircularProgress,
-    IconButton,
-    MenuItem,
-    Paper,
     Stack,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    TextField,
     Typography,
 } from "@mui/material";
-import {
-    CloseRounded,
-    DeleteRounded,
-    EditRounded,
-    SaveRounded,
-    SearchRounded,
-} from "@mui/icons-material";
 
 import { useCategoryContext } from "../contexts/CategoryContext";
 import { useProductContext } from "../contexts/ProductContext";
+import AddProductForm from "../components/AddProductForm";
+import SearchProductsForm from "../components/SearchProductsForm";
+import ProductsGrid from "../components/ProductsGrid";
 
 const EMPTY_PRODUCT_FORM = {
     name: "",
@@ -84,7 +68,6 @@ export default function Inventory() {
     }, [categories.length, getCategories]);
 
     const totalPages = productPagination?.totalPages || 1;
-
     const pageLabel = useMemo(() => {
         const total = productPagination?.total ?? 0;
         if (total === 0) return "No products found";
@@ -241,351 +224,54 @@ export default function Inventory() {
                 <Alert severity="error">{localError || productsError}</Alert>
             )}
 
-            <Paper sx={{ p: { xs: 2, md: 3 } }}>
-                <Stack
-                    component="form"
-                    onSubmit={handleCreate}
-                    direction={{ xs: "column", lg: "row" }}
-                    spacing={1.5}
-                    useFlexGap
-                    flexWrap="wrap"
-                >
-                    <TextField
-                        label="Product name"
-                        value={newProduct.name}
-                        onChange={(event) => {
-                            setNewProduct((current) => ({ ...current, name: event.target.value }));
-                            setLocalError(null);
-                        }}
-                        disabled={productsIsLoading}
-                    />
-                    <TextField
-                        label="SKU"
-                        value={newProduct.sku}
-                        onChange={(event) => {
-                            setNewProduct((current) => ({ ...current, sku: event.target.value }));
-                            setLocalError(null);
-                        }}
-                        disabled={productsIsLoading}
-                    />
-                    <TextField
-                        label="Price"
-                        type="number"
-                        inputProps={{ min: 0.01, step: "0.01" }}
-                        value={newProduct.price}
-                        onChange={(event) => {
-                            setNewProduct((current) => ({ ...current, price: event.target.value }));
-                            setLocalError(null);
-                        }}
-                        disabled={productsIsLoading}
-                    />
-                    <TextField
-                        label="Min stock"
-                        type="number"
-                        inputProps={{ min: 0, step: 1 }}
-                        value={newProduct.minStock}
-                        onChange={(event) => {
-                            setNewProduct((current) => ({ ...current, minStock: event.target.value }));
-                            setLocalError(null);
-                        }}
-                        disabled={productsIsLoading}
-                    />
-                    <TextField
-                        label="Max stock"
-                        type="number"
-                        inputProps={{ min: 0, step: 1 }}
-                        value={newProduct.maxStock}
-                        onChange={(event) => {
-                            setNewProduct((current) => ({ ...current, maxStock: event.target.value }));
-                            setLocalError(null);
-                        }}
-                        disabled={productsIsLoading}
-                    />
-                    <TextField
-                        select
-                        label="Category"
-                        value={newProduct.categoryName}
-                        onChange={(event) => {
-                            setNewProduct((current) => ({ ...current, categoryName: event.target.value }));
-                            setLocalError(null);
-                        }}
-                        disabled={productsIsLoading || categoryOptions.length === 0}
-                    >
-                        {categoryOptions.map((name) => (
-                            <MenuItem key={name} value={name}>
-                                {name}
-                            </MenuItem>
-                        ))}
-                    </TextField>
-                    <Button type="submit" variant="contained" disabled={productsIsLoading}>
-                        Add product
-                    </Button>
-                </Stack>
-            </Paper>
+            <AddProductForm
+                product={newProduct}
+                onFieldChange={(field, value) => {
+                    setNewProduct((current) => ({ ...current, [field]: value }));
+                    setLocalError(null);
+                }}
+                onSubmit={handleCreate}
+                categoryOptions={categoryOptions}
+                disabled={productsIsLoading}
+            />
 
-            <Paper sx={{ p: { xs: 2, md: 3 } }}>
-                <Stack
-                    component="form"
-                    onSubmit={handleSearch}
-                    direction={{ xs: "column", sm: "row" }}
-                    spacing={1.5}
-                    alignItems={{ xs: "stretch", sm: "center" }}
-                >
-                    <TextField
-                        label="Search by name"
-                        value={searchNameInput}
-                        onChange={(event) => setSearchNameInput(event.target.value)}
-                        disabled={productsIsLoading}
-                    />
-                    <TextField
-                        label="Search by SKU"
-                        value={searchSkuInput}
-                        onChange={(event) => setSearchSkuInput(event.target.value)}
-                        disabled={productsIsLoading}
-                    />
-                    <Button
-                        type="submit"
-                        variant="outlined"
-                        startIcon={<SearchRounded />}
-                        disabled={productsIsLoading}
-                    >
-                        Search
-                    </Button>
-                    <Button
-                        type="button"
-                        variant="text"
-                        onClick={() => {
-                            setSearchNameInput("");
-                            setSearchSkuInput("");
-                            setSearchNameQuery("");
-                            setSearchSkuQuery("");
-                            setPage(1);
-                        }}
-                        disabled={productsIsLoading}
-                    >
-                        Clear
-                    </Button>
-                </Stack>
-            </Paper>
+            <SearchProductsForm
+                searchNameInput={searchNameInput}
+                searchSkuInput={searchSkuInput}
+                onSearchNameChange={(value) => setSearchNameInput(value)}
+                onSearchSkuChange={(value) => setSearchSkuInput(value)}
+                onSubmit={handleSearch}
+                onClear={() => {
+                    setSearchNameInput("");
+                    setSearchSkuInput("");
+                    setSearchNameQuery("");
+                    setSearchSkuQuery("");
+                    setPage(1);
+                }}
+                disabled={productsIsLoading}
+            />
 
-            <TableContainer component={Paper}>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell width="6%">ID</TableCell>
-                            <TableCell>Name</TableCell>
-                            <TableCell>SKU</TableCell>
-                            <TableCell>Price</TableCell>
-                            <TableCell>Units</TableCell>
-                            <TableCell>Min / Max</TableCell>
-                            <TableCell>Category</TableCell>
-                            <TableCell width="20%" align="right">Actions</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {productsIsLoading && products.length === 0 ? (
-                            <TableRow>
-                                <TableCell colSpan={8} align="center" sx={{ py: 4 }}>
-                                    <CircularProgress size={28} />
-                                </TableCell>
-                            </TableRow>
-                        ) : products.length === 0 ? (
-                            <TableRow>
-                                <TableCell colSpan={8} align="center" sx={{ py: 4 }}>
-                                    No products found.
-                                </TableCell>
-                            </TableRow>
-                        ) : (
-                            products.map((product) => {
-                                const isEditing = editingId === product.id;
-
-                                return (
-                                    <TableRow key={product.id} hover>
-                                        <TableCell>{product.id}</TableCell>
-                                        <TableCell>
-                                            {isEditing ? (
-                                                <TextField
-                                                    size="small"
-                                                    value={editingProduct.name}
-                                                    onChange={(event) => {
-                                                        setEditingProduct((current) => ({
-                                                            ...current,
-                                                            name: event.target.value,
-                                                        }));
-                                                        setLocalError(null);
-                                                    }}
-                                                    disabled={productsIsLoading}
-                                                />
-                                            ) : (
-                                                product.name
-                                            )}
-                                        </TableCell>
-                                        <TableCell>
-                                            {isEditing ? (
-                                                <TextField
-                                                    size="small"
-                                                    value={editingProduct.sku}
-                                                    onChange={(event) => {
-                                                        setEditingProduct((current) => ({
-                                                            ...current,
-                                                            sku: event.target.value,
-                                                        }));
-                                                        setLocalError(null);
-                                                    }}
-                                                    disabled={productsIsLoading}
-                                                />
-                                            ) : (
-                                                product.sku
-                                            )}
-                                        </TableCell>
-                                        <TableCell>
-                                            {isEditing ? (
-                                                <TextField
-                                                    size="small"
-                                                    type="number"
-                                                    inputProps={{ min: 0.01, step: "0.01" }}
-                                                    value={editingProduct.price}
-                                                    onChange={(event) => {
-                                                        setEditingProduct((current) => ({
-                                                            ...current,
-                                                            price: event.target.value,
-                                                        }));
-                                                        setLocalError(null);
-                                                    }}
-                                                    disabled={productsIsLoading}
-                                                />
-                                            ) : (
-                                                formatPrice(product.price)
-                                            )}
-                                        </TableCell>
-                                        <TableCell>{product.total_units}</TableCell>
-                                        <TableCell>
-                                            {isEditing ? (
-                                                <Stack direction="row" spacing={1}>
-                                                    <TextField
-                                                        size="small"
-                                                        type="number"
-                                                        inputProps={{ min: 0, step: 1 }}
-                                                        value={editingProduct.minStock}
-                                                        onChange={(event) => {
-                                                            setEditingProduct((current) => ({
-                                                                ...current,
-                                                                minStock: event.target.value,
-                                                            }));
-                                                            setLocalError(null);
-                                                        }}
-                                                        disabled={productsIsLoading}
-                                                    />
-                                                    <TextField
-                                                        size="small"
-                                                        type="number"
-                                                        inputProps={{ min: 0, step: 1 }}
-                                                        value={editingProduct.maxStock}
-                                                        onChange={(event) => {
-                                                            setEditingProduct((current) => ({
-                                                                ...current,
-                                                                maxStock: event.target.value,
-                                                            }));
-                                                            setLocalError(null);
-                                                        }}
-                                                        disabled={productsIsLoading}
-                                                    />
-                                                </Stack>
-                                            ) : (
-                                                `${product.min_stock} / ${product.max_stock}`
-                                            )}
-                                        </TableCell>
-                                        <TableCell>
-                                            {isEditing ? (
-                                                <TextField
-                                                    select
-                                                    size="small"
-                                                    value={editingProduct.categoryName}
-                                                    onChange={(event) => {
-                                                        setEditingProduct((current) => ({
-                                                            ...current,
-                                                            categoryName: event.target.value,
-                                                        }));
-                                                        setLocalError(null);
-                                                    }}
-                                                    disabled={productsIsLoading || categoryOptions.length === 0}
-                                                >
-                                                    {categoryOptions.map((name) => (
-                                                        <MenuItem key={name} value={name}>
-                                                            {name}
-                                                        </MenuItem>
-                                                    ))}
-                                                </TextField>
-                                            ) : (
-                                                product.category_name
-                                            )}
-                                        </TableCell>
-                                        <TableCell align="right">
-                                            {isEditing ? (
-                                                <Stack direction="row" spacing={0.5} justifyContent="flex-end">
-                                                    <IconButton
-                                                        color="primary"
-                                                        onClick={() => saveEdit(product.id)}
-                                                        disabled={productsIsLoading}
-                                                    >
-                                                        <SaveRounded />
-                                                    </IconButton>
-                                                    <IconButton
-                                                        color="inherit"
-                                                        onClick={cancelEdit}
-                                                        disabled={productsIsLoading}
-                                                    >
-                                                        <CloseRounded />
-                                                    </IconButton>
-                                                </Stack>
-                                            ) : (
-                                                <Stack direction="row" spacing={0.5} justifyContent="flex-end">
-                                                    <IconButton
-                                                        color="primary"
-                                                        onClick={() => startEdit(product)}
-                                                        disabled={productsIsLoading}
-                                                    >
-                                                        <EditRounded />
-                                                    </IconButton>
-                                                    <IconButton
-                                                        color="error"
-                                                        onClick={() => handleDelete(product.id, product.name)}
-                                                        disabled={productsIsLoading || product.total_units > 0}
-                                                    >
-                                                        <DeleteRounded />
-                                                    </IconButton>
-                                                </Stack>
-                                            )}
-                                        </TableCell>
-                                    </TableRow>
-                                );
-                            })
-                        )}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-
-            <Paper sx={{ p: 2 }}>
-                <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2}>
-                    <Typography color="text.secondary">{pageLabel}</Typography>
-                    <Stack direction="row" spacing={1}>
-                        <Button
-                            variant="outlined"
-                            onClick={() => setPage((current) => Math.max(1, current - 1))}
-                            disabled={productsIsLoading || page <= 1}
-                        >
-                            Previous
-                        </Button>
-                        <Button
-                            variant="outlined"
-                            onClick={() => setPage((current) => current + 1)}
-                            disabled={productsIsLoading || page >= totalPages}
-                        >
-                            Next
-                        </Button>
-                    </Stack>
-                </Stack>
-            </Paper>
+            <ProductsGrid
+                products={products}
+                productsIsLoading={productsIsLoading}
+                editingId={editingId}
+                editingProduct={editingProduct}
+                onEditingProductFieldChange={(field, value) => {
+                    setEditingProduct((current) => ({ ...current, [field]: value }));
+                    setLocalError(null);
+                }}
+                onStartEdit={startEdit}
+                onSaveEdit={saveEdit}
+                onCancelEdit={cancelEdit}
+                onDelete={handleDelete}
+                categoryOptions={categoryOptions}
+                formatPrice={formatPrice}
+                pageLabel={pageLabel}
+                page={page}
+                totalPages={totalPages}
+                onPrevPage={() => setPage((current) => Math.max(1, current - 1))}
+                onNextPage={() => setPage((current) => current + 1)}
+            />
         </Stack>
     );
 }
