@@ -1,33 +1,17 @@
-
-
-
 import { useEffect, useMemo, useState } from "react";
 import {
     Alert,
     Box,
-    Button,
-    CircularProgress,
-    IconButton,
+    Chip,
     Paper,
     Stack,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    TextField,
     Typography,
 } from "@mui/material";
-import {
-    DeleteRounded,
-    EditRounded,
-    SaveRounded,
-    SearchRounded,
-    CloseRounded,
-} from "@mui/icons-material";
 
 import { useCategoryContext } from "../contexts/CategoryContext";
+import AddCategoryForm from "../components/AddCategoryForm";
+import SearchCategoriesForm from "../components/SearchCategoriesForm";
+import CategoriesGrid from "../components/CategoriesGrid";
 
 export default function Categories() {
     const {
@@ -60,12 +44,14 @@ export default function Categories() {
     }, [getCategories, page, searchQuery]);
 
     const totalPages = categoryPagination?.totalPages || 1;
+    const totalCategories = categoryPagination?.total ?? 0;
+    const isFiltered = Boolean(searchQuery);
 
     const pageLabel = useMemo(() => {
-        const total = categoryPagination?.total ?? 0;
+        const total = totalCategories;
         if (total === 0) return "No categories found";
         return `Page ${categoryPagination.page} of ${totalPages} (${total} total)`;
-    }, [categoryPagination, totalPages]);
+    }, [categoryPagination, totalCategories, totalPages]);
 
     const handleCreate = async (event) => {
         event.preventDefault();
@@ -149,199 +135,82 @@ export default function Categories() {
 
     return (
         <Stack spacing={3}>
-            <Stack spacing={0.5}>
-                <Typography variant="h4">Categories</Typography>
-                <Typography color="text.secondary">
-                    Create, update, and manage product categories.
-                </Typography>
-            </Stack>
+            <Paper
+                elevation={0}
+                sx={{
+                    p: { xs: 2, md: 3 },
+                    border: 1,
+                    borderColor: "divider",
+                    backgroundColor: (theme) =>
+                        theme.palette.mode === "dark" ? "rgba(2,136,209,0.18)" : "rgba(2,136,209,0.10)",
+                }}
+            >
+                <Stack
+                    direction={{ xs: "column", md: "row" }}
+                    spacing={1.5}
+                    alignItems={{ xs: "flex-start", md: "center" }}
+                    justifyContent="space-between"
+                >
+                    <Box>
+                        <Typography variant="h4">Category Management</Typography>
+                        <Typography color="text.secondary">
+                            Organize your inventory with clean, searchable categories.
+                        </Typography>
+                    </Box>
+                    <Stack direction="row" spacing={1}>
+                        <Chip label={`${totalCategories} total`} color="primary" variant="outlined" />
+                        {isFiltered && <Chip label={`Filter: ${searchQuery}`} variant="outlined" />}
+                    </Stack>
+                </Stack>
+            </Paper>
 
             {(localError || categoriesError) && (
                 <Alert severity="error">{localError || categoriesError}</Alert>
             )}
 
-            <Paper sx={{ p: { xs: 2, md: 3 } }}>
-                <Stack
-                    component="form"
+            <Stack direction={{ xs: "column", lg: "row" }} spacing={2.5}>
+                <AddCategoryForm
+                    value={newCategoryName}
+                    onChange={(event) => {
+                        setNewCategoryName(event.target.value);
+                        setLocalError(null);
+                    }}
                     onSubmit={handleCreate}
-                    direction={{ xs: "column", md: "row" }}
-                    spacing={1.5}
-                >
-                    <TextField
-                        label="New category name"
-                        value={newCategoryName}
-                        onChange={(event) => {
-                            setNewCategoryName(event.target.value);
-                            setLocalError(null);
-                        }}
-                        disabled={categoriesIsLoading}
-                    />
+                    disabled={categoriesIsLoading}
+                />
 
-                    <Button
-                        type="submit"
-                        variant="contained"
-                        disabled={categoriesIsLoading}
-                    >
-                        Add category
-                    </Button>
-                </Stack>
-            </Paper>
-
-            <Paper sx={{ p: { xs: 2, md: 3 } }}>
-                <Stack
-                    component="form"
+                <SearchCategoriesForm
+                    value={searchInput}
+                    onChange={(event) => setSearchInput(event.target.value)}
                     onSubmit={handleSearch}
-                    direction={{ xs: "column", sm: "row" }}
-                    spacing={1.5}
-                    alignItems={{ xs: "stretch", sm: "center" }}
-                >
-                    <TextField
-                        label="Search by category name"
-                        value={searchInput}
-                        onChange={(event) => setSearchInput(event.target.value)}
-                        disabled={categoriesIsLoading}
-                    />
+                    onClear={() => {
+                        setSearchInput("");
+                        setSearchQuery("");
+                        setPage(1);
+                    }}
+                    disabled={categoriesIsLoading}
+                />
+            </Stack>
 
-                    <Button
-                        type="submit"
-                        variant="outlined"
-                        startIcon={<SearchRounded />}
-                        disabled={categoriesIsLoading}
-                    >
-                        Search
-                    </Button>
-
-                    <Button
-                        type="button"
-                        variant="text"
-                        onClick={() => {
-                            setSearchInput("");
-                            setSearchQuery("");
-                            setPage(1);
-                        }}
-                        disabled={categoriesIsLoading}
-                    >
-                        Clear
-                    </Button>
-                </Stack>
-            </Paper>
-
-            <TableContainer component={Paper}>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell width="12%">ID</TableCell>
-                            <TableCell>Name</TableCell>
-                            <TableCell width="24%" align="right">Actions</TableCell>
-                        </TableRow>
-                    </TableHead>
-
-                    <TableBody>
-                        {categoriesIsLoading && categories.length === 0 ? (
-                            <TableRow>
-                                <TableCell colSpan={3} align="center" sx={{ py: 4 }}>
-                                    <CircularProgress size={28} />
-                                </TableCell>
-                            </TableRow>
-                        ) : categories.length === 0 ? (
-                            <TableRow>
-                                <TableCell colSpan={3} align="center" sx={{ py: 4 }}>
-                                    No categories found.
-                                </TableCell>
-                            </TableRow>
-                        ) : (
-                            categories.map((category) => {
-                                const isEditing = editingId === category.id;
-
-                                return (
-                                    <TableRow key={category.id} hover>
-                                        <TableCell>{category.id}</TableCell>
-
-                                        <TableCell>
-                                            {isEditing ? (
-                                                <TextField
-                                                    size="small"
-                                                    value={editingName}
-                                                    onChange={(event) => {
-                                                        setEditingName(event.target.value);
-                                                        setLocalError(null);
-                                                    }}
-                                                    disabled={categoriesIsLoading}
-                                                />
-                                            ) : (
-                                                category.name
-                                            )}
-                                        </TableCell>
-
-                                        <TableCell align="right">
-                                            {isEditing ? (
-                                                <Stack direction="row" spacing={0.5} justifyContent="flex-end">
-                                                    <IconButton
-                                                        color="primary"
-                                                        onClick={() => saveEdit(category.id)}
-                                                        disabled={categoriesIsLoading}
-                                                    >
-                                                        <SaveRounded />
-                                                    </IconButton>
-                                                    <IconButton
-                                                        color="inherit"
-                                                        onClick={cancelEdit}
-                                                        disabled={categoriesIsLoading}
-                                                    >
-                                                        <CloseRounded />
-                                                    </IconButton>
-                                                </Stack>
-                                            ) : (
-                                                <Stack direction="row" spacing={0.5} justifyContent="flex-end">
-                                                    <IconButton
-                                                        color="primary"
-                                                        onClick={() => startEdit(category)}
-                                                        disabled={categoriesIsLoading}
-                                                    >
-                                                        <EditRounded />
-                                                    </IconButton>
-                                                    <IconButton
-                                                        color="error"
-                                                        onClick={() =>
-                                                            handleDelete(category.id, category.name)
-                                                        }
-                                                        disabled={categoriesIsLoading}
-                                                    >
-                                                        <DeleteRounded />
-                                                    </IconButton>
-                                                </Stack>
-                                            )}
-                                        </TableCell>
-                                    </TableRow>
-                                );
-                            })
-                        )}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-
-            <Paper sx={{ p: 2 }}>
-                <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2}>
-                    <Typography color="text.secondary">{pageLabel}</Typography>
-
-                    <Stack direction="row" spacing={1}>
-                        <Button
-                            variant="outlined"
-                            onClick={() => setPage((current) => Math.max(1, current - 1))}
-                            disabled={categoriesIsLoading || page <= 1}
-                        >
-                            Previous
-                        </Button>
-                        <Button
-                            variant="outlined"
-                            onClick={() => setPage((current) => current + 1)}
-                            disabled={categoriesIsLoading || page >= totalPages}
-                        >
-                            Next
-                        </Button>
-                    </Stack>
-                </Stack>
-            </Paper>
+            <CategoriesGrid
+                categories={categories}
+                categoriesIsLoading={categoriesIsLoading}
+                editingId={editingId}
+                editingName={editingName}
+                onEditingNameChange={(value) => {
+                    setEditingName(value);
+                    setLocalError(null);
+                }}
+                onStartEdit={startEdit}
+                onCancelEdit={cancelEdit}
+                onSaveEdit={saveEdit}
+                onDelete={handleDelete}
+                page={page}
+                pageLabel={pageLabel}
+                totalPages={totalPages}
+                totalCategories={totalCategories}
+                onPageChange={(nextPage) => setPage(nextPage)}
+            />
         </Stack>
     );
 }

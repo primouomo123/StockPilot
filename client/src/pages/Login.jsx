@@ -38,11 +38,35 @@ export default function Login() {
             [name]: value,
         }));
         setLocalError(null);
+        setAuthError(null);
+    };
+
+    const parseLoginError = (err) => {
+        const data = err?.response?.data;
+        if (!data) return "Invalid username or password.";
+
+        if (typeof data === "string") return data;
+        if (typeof data.message === "string") return data.message;
+        if (typeof data.error === "string") return data.error;
+        if (typeof data.msg === "string") return data.msg;
+
+        if (data.errors) {
+            if (typeof data.errors === "string") return data.errors;
+            if (Array.isArray(data.errors)) return data.errors.join(", ");
+            if (typeof data.errors === "object") {
+                const merged = Object.values(data.errors).flat().join(" ");
+                if (merged) return merged;
+            }
+        }
+
+        return "Invalid username or password.";
     };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+        event.stopPropagation();
         setLocalError(null);
+        setAuthError(null);
 
         const username = formData.username.trim();
         const password = formData.password;
@@ -53,10 +77,14 @@ export default function Login() {
         }
 
         try {
-            await login(username, password);
+            const user = await login(username, password);
+            if (!user) {
+                setLocalError("Invalid username or password.");
+                return;
+            }
             navigate("/", { replace: true });
-        } catch {
-            // Error state is already handled in UserContext.
+        } catch (err) {
+            setLocalError(parseLoginError(err));
         }
     };
 

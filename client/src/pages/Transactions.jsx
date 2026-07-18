@@ -4,27 +4,18 @@
 import { useEffect, useMemo, useState } from "react";
 import {
     Alert,
-    Button,
-    CircularProgress,
-    MenuItem,
+    Box,
+    Chip,
     Paper,
     Stack,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    TextField,
     Typography,
 } from "@mui/material";
-import {
-    AddRounded,
-    FilterAltRounded,
-} from "@mui/icons-material";
 
 import { useProductContext } from "../contexts/ProductContext";
 import { useTransactionContext } from "../contexts/TransactionContext";
+import AddTransactionForm from "../components/AddTransactionForm";
+import FilterTransactionsForm from "../components/FilterTransactionsForm";
+import TransactionsGrid from "../components/TransactionsGrid";
 
 const TRANSACTION_TYPES = ["Stock In", "Stock Out"];
 
@@ -74,12 +65,14 @@ export default function Transactions() {
     }, [getProducts, products.length]);
 
     const totalPages = transactionPagination?.totalPages || 1;
+    const totalTransactions = transactionPagination?.total ?? 0;
+    const hasDateFilter = Boolean(startDateQuery || endDateQuery);
 
     const pageLabel = useMemo(() => {
-        const total = transactionPagination?.total ?? 0;
+        const total = totalTransactions;
         if (total === 0) return "No transactions found";
         return `Page ${transactionPagination.page} of ${totalPages} (${total} total)`;
-    }, [transactionPagination, totalPages]);
+    }, [transactionPagination, totalPages, totalTransactions]);
 
     const productOptions = useMemo(() => {
         const names = new Set(products.map((product) => product.name).filter(Boolean));
@@ -175,199 +168,86 @@ export default function Transactions() {
 
     return (
         <Stack spacing={3}>
-            <Stack spacing={0.5}>
-                <Typography variant="h4">Transactions</Typography>
-                <Typography color="text.secondary">
-                    Record stock in and stock out activity, then filter by date range.
-                </Typography>
-            </Stack>
+            <Paper
+                elevation={0}
+                sx={{
+                    p: { xs: 2, md: 3 },
+                    border: 1,
+                    borderColor: "divider",
+                    backgroundColor: (theme) =>
+                        theme.palette.mode === "dark" ? "rgba(2,136,209,0.18)" : "rgba(2,136,209,0.10)",
+                }}
+            >
+                <Stack
+                    direction={{ xs: "column", md: "row" }}
+                    spacing={1.5}
+                    alignItems={{ xs: "flex-start", md: "center" }}
+                    justifyContent="space-between"
+                >
+                    <Box>
+                        <Typography variant="h4">Transaction Activity</Typography>
+                        <Typography color="text.secondary">
+                            Record stock in and stock out activity, then filter by date range.
+                        </Typography>
+                    </Box>
+                    <Stack direction="row" spacing={1}>
+                        <Chip label={`${totalTransactions} total`} color="primary" variant="outlined" />
+                        {hasDateFilter && (
+                            <Chip
+                                label={
+                                    startDateQuery && endDateQuery
+                                        ? `${startDateQuery} to ${endDateQuery}`
+                                        : startDateQuery
+                                          ? `From ${startDateQuery}`
+                                          : `Through ${endDateQuery}`
+                                }
+                                variant="outlined"
+                            />
+                        )}
+                    </Stack>
+                </Stack>
+            </Paper>
 
             {(localError || transactionsError) && (
                 <Alert severity="error">{localError || transactionsError}</Alert>
             )}
 
-            <Paper sx={{ p: { xs: 2, md: 3 } }}>
-                <Stack
-                    component="form"
-                    onSubmit={handleCreate}
-                    direction={{ xs: "column", lg: "row" }}
-                    spacing={1.5}
-                    useFlexGap
-                    flexWrap="wrap"
-                >
-                    <TextField
-                        select
-                        label="Product"
-                        value={newTransaction.productName}
-                        onChange={(event) => {
-                            setNewTransaction((current) => ({
-                                ...current,
-                                productName: event.target.value,
-                            }));
-                            setLocalError(null);
-                        }}
-                        disabled={transactionsIsLoading || productOptions.length === 0}
-                    >
-                        {productOptions.map((name) => (
-                            <MenuItem key={name} value={name}>
-                                {name}
-                            </MenuItem>
-                        ))}
-                    </TextField>
+            <AddTransactionForm
+                transaction={newTransaction}
+                transactionTypes={TRANSACTION_TYPES}
+                productOptions={productOptions}
+                onFieldChange={(field, value) => {
+                    setNewTransaction((current) => ({
+                        ...current,
+                        [field]: value,
+                    }));
+                    setLocalError(null);
+                }}
+                onSubmit={handleCreate}
+                disabled={transactionsIsLoading}
+            />
 
-                    <TextField
-                        select
-                        label="Type"
-                        value={newTransaction.transactionType}
-                        onChange={(event) => {
-                            setNewTransaction((current) => ({
-                                ...current,
-                                transactionType: event.target.value,
-                            }));
-                            setLocalError(null);
-                        }}
-                        disabled={transactionsIsLoading}
-                    >
-                        {TRANSACTION_TYPES.map((type) => (
-                            <MenuItem key={type} value={type}>
-                                {type}
-                            </MenuItem>
-                        ))}
-                    </TextField>
+            <FilterTransactionsForm
+                startDateInput={startDateInput}
+                endDateInput={endDateInput}
+                onStartDateChange={(value) => setStartDateInput(value)}
+                onEndDateChange={(value) => setEndDateInput(value)}
+                onSubmit={handleFilter}
+                onClear={clearFilters}
+                disabled={transactionsIsLoading}
+            />
 
-                    <TextField
-                        label="Quantity"
-                        type="number"
-                        inputProps={{ min: 1, step: 1 }}
-                        value={newTransaction.quantityChange}
-                        onChange={(event) => {
-                            setNewTransaction((current) => ({
-                                ...current,
-                                quantityChange: event.target.value,
-                            }));
-                            setLocalError(null);
-                        }}
-                        disabled={transactionsIsLoading}
-                    />
-
-                    <Button
-                        type="submit"
-                        variant="contained"
-                        startIcon={<AddRounded />}
-                        disabled={transactionsIsLoading}
-                    >
-                        Add transaction
-                    </Button>
-                </Stack>
-            </Paper>
-
-            <Paper sx={{ p: { xs: 2, md: 3 } }}>
-                <Stack
-                    component="form"
-                    onSubmit={handleFilter}
-                    direction={{ xs: "column", sm: "row" }}
-                    spacing={1.5}
-                    alignItems={{ xs: "stretch", sm: "center" }}
-                >
-                    <TextField
-                        label="Start date"
-                        type="date"
-                        value={startDateInput}
-                        onChange={(event) => setStartDateInput(event.target.value)}
-                        disabled={transactionsIsLoading}
-                        InputLabelProps={{ shrink: true }}
-                    />
-
-                    <TextField
-                        label="End date"
-                        type="date"
-                        value={endDateInput}
-                        onChange={(event) => setEndDateInput(event.target.value)}
-                        disabled={transactionsIsLoading}
-                        InputLabelProps={{ shrink: true }}
-                    />
-
-                    <Button
-                        type="submit"
-                        variant="outlined"
-                        startIcon={<FilterAltRounded />}
-                        disabled={transactionsIsLoading}
-                    >
-                        Filter
-                    </Button>
-
-                    <Button
-                        type="button"
-                        variant="text"
-                        onClick={clearFilters}
-                        disabled={transactionsIsLoading}
-                    >
-                        Clear
-                    </Button>
-                </Stack>
-            </Paper>
-
-            <TableContainer component={Paper}>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell width="8%">ID</TableCell>
-                            <TableCell>Product</TableCell>
-                            <TableCell>Type</TableCell>
-                            <TableCell>Quantity</TableCell>
-                            <TableCell>Date</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {transactionsIsLoading && transactions.length === 0 ? (
-                            <TableRow>
-                                <TableCell colSpan={5} align="center" sx={{ py: 4 }}>
-                                    <CircularProgress size={28} />
-                                </TableCell>
-                            </TableRow>
-                        ) : transactions.length === 0 ? (
-                            <TableRow>
-                                <TableCell colSpan={5} align="center" sx={{ py: 4 }}>
-                                    No transactions found.
-                                </TableCell>
-                            </TableRow>
-                        ) : (
-                            transactions.map((transaction) => (
-                                <TableRow key={transaction.id} hover>
-                                    <TableCell>{transaction.id}</TableCell>
-                                    <TableCell>{transaction.product_name}</TableCell>
-                                    <TableCell>{transaction.transaction_type}</TableCell>
-                                    <TableCell>{formatQuantity(transaction.transaction_type, transaction.quantity_change)}</TableCell>
-                                    <TableCell>{formatDate(transaction.created_at)}</TableCell>
-                                </TableRow>
-                            ))
-                        )}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-
-            <Paper sx={{ p: 2 }}>
-                <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2}>
-                    <Typography color="text.secondary">{pageLabel}</Typography>
-
-                    <Stack direction="row" spacing={1}>
-                        <Button
-                            variant="outlined"
-                            onClick={() => setPage((current) => Math.max(1, current - 1))}
-                            disabled={transactionsIsLoading || page <= 1}
-                        >
-                            Previous
-                        </Button>
-                        <Button
-                            variant="outlined"
-                            onClick={() => setPage((current) => current + 1)}
-                            disabled={transactionsIsLoading || page >= totalPages}
-                        >
-                            Next
-                        </Button>
-                    </Stack>
-                </Stack>
-            </Paper>
+            <TransactionsGrid
+                transactions={transactions}
+                transactionsIsLoading={transactionsIsLoading}
+                formatQuantity={formatQuantity}
+                formatDate={formatDate}
+                pageLabel={pageLabel}
+                page={page}
+                totalPages={totalPages}
+                onPrevPage={() => setPage((current) => Math.max(1, current - 1))}
+                onNextPage={() => setPage((current) => current + 1)}
+            />
         </Stack>
     );
 }

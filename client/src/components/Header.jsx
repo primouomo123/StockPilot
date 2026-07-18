@@ -57,11 +57,12 @@ export default function Header({ onLogout }) {
         >
             <Toolbar
                 sx={{
-                    minHeight: 80,
+                    minHeight: { xs: 74, md: 80 },
                     display: "flex",
                     justifyContent: "space-between",
-                    gap: 3,
+                    gap: 2,
                     flexWrap: "wrap",
+                    py: 1,
                 }}
             >
                 {/* Logo */}
@@ -95,9 +96,16 @@ export default function Header({ onLogout }) {
                 {/* Navigation */}
                 <Stack
                     direction="row"
-                    spacing={1}
+                    spacing={0.75}
                     flexWrap="wrap"
                     useFlexGap
+                    sx={{
+                        p: 0.5,
+                        borderRadius: 2.5,
+                        bgcolor: "action.hover",
+                        border: 1,
+                        borderColor: "divider",
+                    }}
                 >
                     {NAV_ITEMS.map((item) => {
                         const active = isRouteActive(
@@ -112,15 +120,19 @@ export default function Header({ onLogout }) {
                                 to={item.to}
                                 color={active ? "primary" : "inherit"}
                                 sx={{
-                                    px: 2,
+                                    px: 1.5,
+                                    py: 0.65,
                                     borderRadius: 2,
+                                    textTransform: "none",
+                                    minWidth: 0,
                                     fontWeight: active ? 700 : 500,
-                                    borderBottom: active
-                                        ? 2
-                                        : 2,
-                                    borderColor: active
-                                        ? "primary.main"
-                                        : "transparent",
+                                    border: 1,
+                                    borderColor: active ? "primary.main" : "transparent",
+                                    bgcolor: active ? "background.paper" : "transparent",
+                                    boxShadow: active ? 1 : 0,
+                                    "&:hover": {
+                                        bgcolor: active ? "background.paper" : "action.selected",
+                                    },
                                 }}
                             >
                                 {item.label}
@@ -132,12 +144,13 @@ export default function Header({ onLogout }) {
                 {/* Right Side */}
                 <Stack
                     direction="row"
-                    spacing={2}
+                    spacing={1}
                     alignItems="center"
                 >
                     <IconButton
                         onClick={toggleTheme}
                         color="inherit"
+                        sx={{ border: 1, borderColor: "divider" }}
                     >
                         {isDarkMode ? (
                             <LightModeRounded />
@@ -150,6 +163,13 @@ export default function Header({ onLogout }) {
                         direction="row"
                         spacing={1}
                         alignItems="center"
+                        sx={{
+                            px: 1,
+                            py: 0.5,
+                            borderRadius: 2,
+                            border: 1,
+                            borderColor: "divider",
+                        }}
                     >
                         <AccountCircleRounded color="action" />
 
@@ -177,6 +197,7 @@ export default function Header({ onLogout }) {
                         startIcon={<LogoutRounded />}
                         onClick={onLogout}
                         disabled={authIsLoading}
+                        sx={{ textTransform: "none", borderRadius: 2 }}
                     >
                         {authIsLoading
                             ? "Signing out..."

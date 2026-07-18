@@ -2,15 +2,18 @@
 import { useEffect, useMemo, useState } from "react";
 import {
     Alert,
+    Avatar,
     Box,
     Button,
     Chip,
     CircularProgress,
+    Divider,
     Dialog,
     DialogActions,
     DialogContent,
     DialogTitle,
     IconButton,
+    LinearProgress,
     MenuItem,
     Paper,
     Stack,
@@ -28,7 +31,6 @@ import {
     CategoryRounded,
     EditRounded,
     Inventory2Rounded,
-    RefreshRounded,
     SaveRounded,
     SellRounded,
     WarningAmberRounded,
@@ -49,22 +51,32 @@ const EMPTY_PRODUCT_FORM = {
 
 function StatCard({ title, value, subtitle, icon }) {
     return (
-        <Paper sx={{ p: 2.5, border: 1, borderColor: "divider" }}>
+        <Paper
+            sx={{
+                p: 2.5,
+                border: 1,
+                borderColor: "divider",
+                borderRadius: 2,
+                height: "100%",
+            }}
+        >
             <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2}>
                 <Box>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="overline" color="text.secondary" sx={{ letterSpacing: 0.6 }}>
                         {title}
                     </Typography>
-                    <Typography variant="h5" sx={{ mt: 0.25 }}>
+                    <Typography variant="h5" sx={{ mt: 0.5, fontWeight: 700 }}>
                         {value}
                     </Typography>
                     {subtitle && (
-                        <Typography variant="caption" color="text.secondary">
+                        <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
                             {subtitle}
                         </Typography>
                     )}
                 </Box>
-                {icon}
+                <Avatar variant="rounded" sx={{ bgcolor: "action.hover", color: "text.primary", width: 40, height: 40 }}>
+                    {icon}
+                </Avatar>
             </Stack>
         </Paper>
     );
@@ -79,7 +91,7 @@ function ProductListCard({ title, products, emptyMessage, severity = "default", 
     };
 
     return (
-        <Paper sx={{ p: 2.5 }}>
+        <Paper sx={{ p: 2.5, border: 1, borderColor: "divider", borderRadius: 2, height: "100%" }}>
             <Stack spacing={1.5}>
                 <Stack direction="row" alignItems="center" justifyContent="space-between">
                     <Typography variant="h6">{title}</Typography>
@@ -94,7 +106,15 @@ function ProductListCard({ title, products, emptyMessage, severity = "default", 
                             <Paper
                                 key={product.id}
                                 variant="outlined"
-                                sx={{ p: 1.25, display: "flex", justifyContent: "space-between", alignItems: "center" }}
+                                sx={{
+                                    p: 1.25,
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                    borderRadius: 2,
+                                    transition: "background-color 120ms ease",
+                                    "&:hover": { backgroundColor: "action.hover" },
+                                }}
                             >
                                 <Box>
                                     <Typography fontWeight={600}>{product.name}</Typography>
@@ -179,8 +199,8 @@ export default function Dashboard() {
             return { error: "Price must be greater than 0." };
         }
 
-        if (Number.isNaN(minStock) || minStock < 0 || Number.isNaN(maxStock) || maxStock < 0) {
-            return { error: "Min stock and max stock must be 0 or greater." };
+        if (Number.isNaN(minStock) || minStock <= 0 || Number.isNaN(maxStock) || maxStock <= 0) {
+            return { error: "Min stock and max stock must be greater than 0." };
         }
 
         if (minStock > maxStock) {
@@ -233,36 +253,45 @@ export default function Dashboard() {
         }
     };
 
-    const handleRefresh = async () => {
-        await getSummary();
-    };
-
     return (
         <Stack spacing={3}>
-            <Stack
-                direction={{ xs: "column", sm: "row" }}
-                justifyContent="space-between"
-                alignItems={{ xs: "flex-start", sm: "center" }}
-                spacing={1.5}
+            <Paper
+                elevation={0}
+                sx={{
+                    p: { xs: 2.25, md: 3 },
+                    border: 1,
+                    borderColor: "divider",
+                    borderRadius: 2,
+                    backgroundColor: (theme) =>
+                        theme.palette.mode === "dark" ? "rgba(2,136,209,0.18)" : "rgba(2,136,209,0.10)",
+                }}
             >
-                <Stack spacing={0.5}>
-                    <Typography variant="h4">Dashboard</Typography>
-                    <Typography color="text.secondary">
-                        Overview of stock health, inventory value, and recent activity.
-                    </Typography>
-                </Stack>
+                <Stack spacing={2}>
+                    <Stack
+                        direction={{ xs: "column", sm: "row" }}
+                        justifyContent="space-between"
+                        alignItems={{ xs: "flex-start", sm: "center" }}
+                        spacing={1.5}
+                    >
+                        <Stack spacing={0.5}>
+                            <Typography variant="h4">Dashboard</Typography>
+                            <Typography color="text.secondary">
+                                Overview of stock health, inventory value, and recent activity.
+                            </Typography>
+                        </Stack>
+                    </Stack>
 
-                <Button
-                    variant="outlined"
-                    startIcon={<RefreshRounded />}
-                    onClick={handleRefresh}
-                    disabled={dashboardIsLoading}
-                >
-                    Refresh
-                </Button>
-            </Stack>
+                    <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                        <Chip size="small" label={`${stats.totalProducts} products`} variant="outlined" color="primary" />
+                        <Chip size="small" label={`${stats.totalCategories} categories`} variant="outlined" />
+                        <Chip size="small" label={`${stats.totalUnits} units in stock`} variant="outlined" color="warning" />
+                    </Stack>
+                </Stack>
+            </Paper>
 
             {(localError || dashboardError) && <Alert severity="error">{localError || dashboardError}</Alert>}
+
+            {dashboardIsLoading ? <LinearProgress /> : null}
 
             {dashboardIsLoading && !dashboardError ? (
                 <Paper sx={{ py: 6 }}>
@@ -288,27 +317,34 @@ export default function Dashboard() {
                     title="Total Products"
                     value={stats.totalProducts}
                     subtitle="Tracked in inventory"
-                    icon={<Inventory2Rounded color="primary" />}
+                    icon={<Inventory2Rounded />}
                 />
                 <StatCard
                     title="Total Categories"
                     value={stats.totalCategories}
                     subtitle="Organized groups"
-                    icon={<CategoryRounded color="primary" />}
+                    icon={<CategoryRounded />}
                 />
                 <StatCard
                     title="Total Units"
                     value={stats.totalUnits}
                     subtitle="Current stock count"
-                    icon={<WarningAmberRounded color="warning" />}
+                    icon={<WarningAmberRounded />}
                 />
                 <StatCard
                     title="Inventory Value"
                     value={inventoryValueLabel}
                     subtitle="Based on price x stock"
-                    icon={<SellRounded color="success" />}
+                    icon={<SellRounded />}
                 />
             </Box>
+
+            <Stack direction="row" alignItems="center" justifyContent="space-between">
+                <Typography variant="h6">Stock Alerts</Typography>
+                <Typography variant="body2" color="text.secondary">
+                    Products that need attention
+                </Typography>
+            </Stack>
 
             <Box
                 sx={{
@@ -343,6 +379,13 @@ export default function Dashboard() {
                 />
             </Box>
 
+            <Stack direction="row" alignItems="center" justifyContent="space-between">
+                <Typography variant="h6">Recent Activity</Typography>
+                <Typography variant="body2" color="text.secondary">
+                    Latest catalog and stock movement updates
+                </Typography>
+            </Stack>
+
             <Box
                 sx={{
                     display: "grid",
@@ -353,15 +396,25 @@ export default function Dashboard() {
                     },
                 }}
             >
-                <TableContainer component={Paper}>
-                    <Table>
+                <Paper sx={{ border: 1, borderColor: "divider", borderRadius: 2, overflow: "hidden" }}>
+                    <Box sx={{ px: 2.5, py: 1.5 }}>
+                        <Typography variant="subtitle1" fontWeight={700}>
+                            Recent Products
+                        </Typography>
+                    </Box>
+                    <Divider />
+                    <TableContainer>
+                    <Table size="small">
                         <TableHead>
-                            <TableRow>
-                                <TableCell colSpan={4}>
-                                    <Typography variant="h6">Recent Products</Typography>
-                                </TableCell>
-                            </TableRow>
-                            <TableRow>
+                            <TableRow
+                                sx={{
+                                    "& .MuiTableCell-root": {
+                                        fontWeight: 700,
+                                        bgcolor: (theme) =>
+                                            theme.palette.mode === "dark" ? "rgba(2,136,209,0.20)" : "grey.100",
+                                    },
+                                }}
+                            >
                                 <TableCell>Name</TableCell>
                                 <TableCell>SKU</TableCell>
                                 <TableCell>Category</TableCell>
@@ -377,7 +430,18 @@ export default function Dashboard() {
                                 </TableRow>
                             ) : (
                                 recentProducts.map((product) => (
-                                    <TableRow key={product.id} hover>
+                                    <TableRow
+                                        key={product.id}
+                                        hover
+                                        sx={{
+                                            "&:nth-of-type(even)": {
+                                                backgroundColor: (theme) =>
+                                                    theme.palette.mode === "dark"
+                                                        ? "rgba(255, 255, 255, 0.03)"
+                                                        : "rgba(0, 0, 0, 0.015)",
+                                            },
+                                        }}
+                                    >
                                         <TableCell>{product.name}</TableCell>
                                         <TableCell>{product.sku}</TableCell>
                                         <TableCell>{product.category_name}</TableCell>
@@ -387,17 +451,28 @@ export default function Dashboard() {
                             )}
                         </TableBody>
                     </Table>
-                </TableContainer>
+                    </TableContainer>
+                </Paper>
 
-                <TableContainer component={Paper}>
-                    <Table>
+                <Paper sx={{ border: 1, borderColor: "divider", borderRadius: 2, overflow: "hidden" }}>
+                    <Box sx={{ px: 2.5, py: 1.5 }}>
+                        <Typography variant="subtitle1" fontWeight={700}>
+                            Recent Transactions
+                        </Typography>
+                    </Box>
+                    <Divider />
+                    <TableContainer>
+                    <Table size="small">
                         <TableHead>
-                            <TableRow>
-                                <TableCell colSpan={4}>
-                                    <Typography variant="h6">Recent Transactions</Typography>
-                                </TableCell>
-                            </TableRow>
-                            <TableRow>
+                            <TableRow
+                                sx={{
+                                    "& .MuiTableCell-root": {
+                                        fontWeight: 700,
+                                        bgcolor: (theme) =>
+                                            theme.palette.mode === "dark" ? "rgba(2,136,209,0.20)" : "grey.100",
+                                    },
+                                }}
+                            >
                                 <TableCell>Product</TableCell>
                                 <TableCell>Type</TableCell>
                                 <TableCell align="right">Quantity</TableCell>
@@ -418,9 +493,27 @@ export default function Dashboard() {
                                         : "-";
 
                                     return (
-                                        <TableRow key={transaction.id} hover>
+                                        <TableRow
+                                            key={transaction.id}
+                                            hover
+                                            sx={{
+                                                "&:nth-of-type(even)": {
+                                                    backgroundColor: (theme) =>
+                                                        theme.palette.mode === "dark"
+                                                            ? "rgba(255, 255, 255, 0.03)"
+                                                            : "rgba(0, 0, 0, 0.015)",
+                                                },
+                                            }}
+                                        >
                                             <TableCell>{transaction.product_name}</TableCell>
-                                            <TableCell>{transaction.transaction_type}</TableCell>
+                                            <TableCell>
+                                                <Chip
+                                                    size="small"
+                                                    label={transaction.transaction_type}
+                                                    color={transaction.transaction_type === "Stock Out" ? "warning" : "success"}
+                                                    variant="outlined"
+                                                />
+                                            </TableCell>
                                             <TableCell align="right">{transaction.quantity_change}</TableCell>
                                             <TableCell>{date}</TableCell>
                                         </TableRow>
@@ -429,7 +522,8 @@ export default function Dashboard() {
                             )}
                         </TableBody>
                     </Table>
-                </TableContainer>
+                    </TableContainer>
+                </Paper>
             </Box>
 
             <Dialog open={editingProductId !== null} onClose={closeEdit} fullWidth maxWidth="sm">
@@ -467,27 +561,49 @@ export default function Dashboard() {
                             inputProps={{ min: 0.01, step: "0.01" }}
                             value={editingProduct.price}
                             onChange={(event) => {
-                                setEditingProduct((current) => ({ ...current, price: event.target.value }));
+                                const nextValue = event.target.value;
+                                if (nextValue !== "") {
+                                    const numericValue = Number(nextValue);
+                                    if (Number.isNaN(numericValue) || numericValue < 0) return;
+                                }
+
+                                setEditingProduct((current) => ({ ...current, price: nextValue }));
                                 setLocalError(null);
                             }}
                         />
                         <TextField
                             label="Min stock"
                             type="number"
-                            inputProps={{ min: 0, step: 1 }}
+                            inputProps={{ min: 1, step: 1 }}
                             value={editingProduct.minStock}
                             onChange={(event) => {
-                                setEditingProduct((current) => ({ ...current, minStock: event.target.value }));
+                                const nextValue = event.target.value;
+                                if (nextValue !== "") {
+                                    const numericValue = Number(nextValue);
+                                    if (Number.isNaN(numericValue) || numericValue < 0 || !Number.isInteger(numericValue)) {
+                                        return;
+                                    }
+                                }
+
+                                setEditingProduct((current) => ({ ...current, minStock: nextValue }));
                                 setLocalError(null);
                             }}
                         />
                         <TextField
                             label="Max stock"
                             type="number"
-                            inputProps={{ min: 0, step: 1 }}
+                            inputProps={{ min: 1, step: 1 }}
                             value={editingProduct.maxStock}
                             onChange={(event) => {
-                                setEditingProduct((current) => ({ ...current, maxStock: event.target.value }));
+                                const nextValue = event.target.value;
+                                if (nextValue !== "") {
+                                    const numericValue = Number(nextValue);
+                                    if (Number.isNaN(numericValue) || numericValue < 0 || !Number.isInteger(numericValue)) {
+                                        return;
+                                    }
+                                }
+
+                                setEditingProduct((current) => ({ ...current, maxStock: nextValue }));
                                 setLocalError(null);
                             }}
                         />

@@ -3,9 +3,9 @@ import { useUserContext } from "../contexts/UserContext";
 
 
 export default function ProtectedRoute() {
-  const { currentUser, authIsLoading } = useUserContext();
+  const { currentUser, authIsReady } = useUserContext();
 
-  if (authIsLoading) return null;
+  if (!authIsReady) return null;
   if (!currentUser) return <Navigate to="/login" replace />;
 
   return <Outlet />;
