@@ -14,11 +14,16 @@ const UserContext = createContext(null);
 export function UserProvider({ children }) {
 	const [currentUser, setCurrentUser] = useState(null);
 	const [authIsLoading, setAuthIsLoading] = useState(true);
+	const [authIsReady, setAuthIsReady] = useState(false);
 	const [authError, setAuthError] = useState(null);
 
 	const parseError = useCallback((err, fallback) => {
 		const data = err?.response?.data;
 		if (!data) return fallback;
+
+		if (typeof data === "string") {
+			return data || fallback;
+		}
 
 		if (data.errors && typeof data.errors === "object") {
 			const messages = Array.isArray(data.errors)
@@ -27,7 +32,7 @@ export function UserProvider({ children }) {
 			if (messages) return messages;
 		}
 
-		return data.message || data.error || fallback;
+		return data.message || data.error || data.msg || fallback;
 	}, []);
 
 	const clearAuthState = useCallback(() => {
@@ -64,14 +69,17 @@ export function UserProvider({ children }) {
 			const token = response?.data?.access_token;
 			const user = response?.data?.user ?? null;
 
-			if (token) {
-				localStorage.setItem("token", token);
+			if (!token || !user) {
+				throw new Error("Invalid login response payload");
 			}
+
+			localStorage.setItem("token", token);
 
 			setCurrentUser(user);
 			return user;
 		} catch (err) {
 			const message = parseError(err, "An error occurred during login.");
+			localStorage.removeItem("token");
 			setAuthError(message);
 			setCurrentUser(null);
 			throw err;
@@ -164,12 +172,15 @@ export function UserProvider({ children }) {
 
 		if (!token) {
 			setAuthIsLoading(false);
+			setAuthIsReady(true);
 			return;
 		}
 
 		loadCurrentUser().catch(() => {
 			localStorage.removeItem("token");
 			setCurrentUser(null);
+		}).finally(() => {
+			setAuthIsReady(true);
 		});
 	}, [loadCurrentUser]);
 
@@ -185,6 +196,7 @@ export function UserProvider({ children }) {
 
 	const value = useMemo(() => ({
 		currentUser,
+		authIsReady,
 		authIsLoading,
 		authError,
 		isAuthenticated: Boolean(currentUser),
@@ -199,6 +211,7 @@ export function UserProvider({ children }) {
 		setAuthError,
 	}), [
 		currentUser,
+		authIsReady,
 		authIsLoading,
 		authError,
 		login,
