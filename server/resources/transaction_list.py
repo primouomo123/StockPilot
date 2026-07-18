@@ -53,6 +53,9 @@ class TransactionList(Resource):
             next_day = parsed_end_date + timedelta(days=1)
             query = query.filter(Transaction.created_at < next_day)
 
+        # Newest transactions first.
+        query = query.order_by(Transaction.created_at.desc(), Transaction.id.desc())
+
         pagination = query.paginate(page=page, per_page=per_page, error_out=False)
         
         return {

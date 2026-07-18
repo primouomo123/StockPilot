@@ -3,12 +3,14 @@ from flask_jwt_extended import get_jwt_identity, jwt_required
 
 from models import Product, Transaction, Category
 from schemas import ProductSchema, TransactionSchema
+from utils import NEAR_MIN_STOCK_BUFFER
 
 from config import db
 
 class Summary(Resource):
     @jwt_required()
     def get(self):
+        near_min_stock_buffer = NEAR_MIN_STOCK_BUFFER
         user_id = get_jwt_identity()
         product_schema = ProductSchema(many=True)
         
@@ -46,6 +48,20 @@ class Summary(Resource):
         )
         low_stock_products_data = product_schema.dump(low_stock_products)
 
+        # Get products that are close to minimum stock level.
+        near_min_stock_products = (
+            Product.query
+            .filter_by(user_id=user_id)
+            .filter(
+                Product.total_units > Product.min_stock,
+                Product.total_units <= (Product.min_stock + near_min_stock_buffer),
+            )
+            .order_by(Product.total_units.asc(), Product.id.desc())
+            .limit(10)
+            .all()
+        )
+        near_min_stock_products_data = product_schema.dump(near_min_stock_products)
+
         # Get products with 0 units for the user
         zero_stock_products = (
             Product.query
@@ -82,6 +98,7 @@ class Summary(Resource):
             "total_units": total_units,
             "inventory_value": inventory_value,
             "low_stock_products": low_stock_products_data,
+            "near_min_stock_products": near_min_stock_products_data,
             "zero_stock_products": zero_stock_products_data,
             "recent_products": recent_products_data,
             "recent_transactions": transactions_data

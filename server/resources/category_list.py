@@ -25,6 +25,9 @@ class CategoryList(Resource):
         if isinstance(name_filter, str) and name_filter.strip():
             query = query.filter(Category.name.ilike(f"%{name_filter.strip().title()}%"))
 
+        # Newest categories first.
+        query = query.order_by(Category.id.desc())
+
         pagination = query.paginate(page=page, per_page=per_page, error_out=False)
         
         return {

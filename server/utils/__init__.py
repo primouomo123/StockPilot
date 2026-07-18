@@ -3,4 +3,5 @@ from .constants import (TRANSACTION_TYPES,
                         PRODUCT_CREATION_ALLOWED_KEYS, PRODUCT_UPDATE_ALLOWED_KEYS,
                         CATEGORY_CREATION_ALLOWED_KEYS, CATEGORY_UPDATE_ALLOWED_KEYS,
                         USER_ALLOWED_KEYS,
-                        TRANSACTION_CREATION_ALLOWED_KEYS,)
+                        TRANSACTION_CREATION_ALLOWED_KEYS,
+                        NEAR_MIN_STOCK_BUFFER)

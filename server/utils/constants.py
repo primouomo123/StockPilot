@@ -13,3 +13,4 @@ CATEGORY_CREATION_ALLOWED_KEYS = {'name', 'user_id'}
 CATEGORY_UPDATE_ALLOWED_KEYS = {'name'}
 USER_ALLOWED_KEYS = {'username', 'email', 'password'}
 TRANSACTION_CREATION_ALLOWED_KEYS = {'transaction_type', 'quantity_change', 'product_id', 'user_id'}
+NEAR_MIN_STOCK_BUFFER = 5  # Buffer for near minimum stock level
