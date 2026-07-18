@@ -49,6 +49,12 @@ const EMPTY_PRODUCT_FORM = {
     categoryName: "",
 };
 
+function formatCount(value) {
+    const number = Number(value ?? 0);
+    if (Number.isNaN(number)) return value;
+    return number.toLocaleString();
+}
+
 function StatCard({ title, value, subtitle, icon }) {
     return (
         <Paper
@@ -111,7 +117,7 @@ function ProductListCard({ title, products, emptyMessage, severity = "default", 
                 <Stack spacing={1}>
                     <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
                         <Typography variant="h6">{title}</Typography>
-                        <Chip size="small" label={`${products.length} items`} color={colorMap[severity]} />
+                        <Chip size="small" label={`${formatCount(products.length)} items`} color={colorMap[severity]} />
                     </Stack>
                     <Typography variant="body2" color="text.secondary">
                         {helperTextMap[severity]}
@@ -165,7 +171,7 @@ function ProductListCard({ title, products, emptyMessage, severity = "default", 
                                             ) : null}
                                             <Chip
                                                 size="small"
-                                                label={`Min ${product.min_stock} / Max ${product.max_stock}`}
+                                                label={`Min ${formatCount(product.min_stock)} / Max ${formatCount(product.max_stock)}`}
                                                 variant="outlined"
                                             />
                                         </Stack>
@@ -183,7 +189,7 @@ function ProductListCard({ title, products, emptyMessage, severity = "default", 
                                                 Current units
                                             </Typography>
                                             <Typography variant="h6" fontWeight={700}>
-                                                {product.total_units}
+                                                {formatCount(product.total_units)}
                                             </Typography>
                                         </Box>
                                         {onEdit ? (
@@ -232,7 +238,12 @@ export default function Dashboard() {
     const inventoryValueLabel = useMemo(() => {
         const number = Number(stats.inventoryValue ?? 0);
         if (Number.isNaN(number)) return "$0.00";
-        return `$${number.toFixed(2)}`;
+        return number.toLocaleString("en-US", {
+            style: "currency",
+            currency: "USD",
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        });
     }, [stats.inventoryValue]);
 
     const recentTransactions = summary.recent_transactions ?? [];
@@ -342,9 +353,9 @@ export default function Dashboard() {
                     </Stack>
 
                     <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-                        <Chip size="small" label={`${stats.totalProducts} products`} variant="outlined" color="primary" />
-                        <Chip size="small" label={`${stats.totalCategories} categories`} variant="outlined" />
-                        <Chip size="small" label={`${stats.totalUnits} units in stock`} variant="outlined" color="warning" />
+                        <Chip size="small" label={`${formatCount(stats.totalProducts)} products`} variant="outlined" color="primary" />
+                        <Chip size="small" label={`${formatCount(stats.totalCategories)} categories`} variant="outlined" />
+                        <Chip size="small" label={`${formatCount(stats.totalUnits)} units in stock`} variant="outlined" color="warning" />
                     </Stack>
                 </Stack>
             </Paper>
@@ -375,19 +386,19 @@ export default function Dashboard() {
             >
                 <StatCard
                     title="Total Products"
-                    value={stats.totalProducts}
+                    value={formatCount(stats.totalProducts)}
                     subtitle="Tracked in inventory"
                     icon={<Inventory2Rounded />}
                 />
                 <StatCard
                     title="Total Categories"
-                    value={stats.totalCategories}
+                    value={formatCount(stats.totalCategories)}
                     subtitle="Organized groups"
                     icon={<CategoryRounded />}
                 />
                 <StatCard
                     title="Total Units"
-                    value={stats.totalUnits}
+                    value={formatCount(stats.totalUnits)}
                     subtitle="Current stock count"
                     icon={<WarningAmberRounded />}
                 />
@@ -439,12 +450,21 @@ export default function Dashboard() {
                 />
             </Box>
 
-            <Stack direction="row" alignItems="center" justifyContent="space-between">
-                <Typography variant="h6">Recent Activity</Typography>
-                <Typography variant="body2" color="text.secondary">
-                    Latest catalog and stock movement updates
-                </Typography>
-            </Stack>
+            <Paper
+                variant="outlined"
+                sx={{
+                    px: { xs: 2, md: 2.5 },
+                    py: { xs: 1.5, md: 1.75 },
+                    borderRadius: 2,
+                }}
+            >
+                <Stack spacing={0.5}>
+                    <Typography variant="h6">Recent Activity</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                        Latest catalog and stock movement updates
+                    </Typography>
+                </Stack>
+            </Paper>
 
             <Box
                 sx={{
@@ -505,7 +525,7 @@ export default function Dashboard() {
                                         <TableCell>{product.name}</TableCell>
                                         <TableCell>{product.sku}</TableCell>
                                         <TableCell>{product.category_name}</TableCell>
-                                        <TableCell align="right">{product.total_units}</TableCell>
+                                        <TableCell align="right">{formatCount(product.total_units)}</TableCell>
                                     </TableRow>
                                 ))
                             )}
@@ -574,7 +594,7 @@ export default function Dashboard() {
                                                     variant="outlined"
                                                 />
                                             </TableCell>
-                                            <TableCell align="right">{transaction.quantity_change}</TableCell>
+                                            <TableCell align="right">{formatCount(transaction.quantity_change)}</TableCell>
                                             <TableCell>{date}</TableCell>
                                         </TableRow>
                                     );

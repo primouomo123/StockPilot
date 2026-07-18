@@ -36,6 +36,7 @@ export default function ProductsGrid({
     onDelete,
     categoryOptions,
     formatPrice,
+    formatCount,
     pageLabel,
     page,
     totalPages,
@@ -184,7 +185,7 @@ export default function ProductsGrid({
                                                 formatPrice(product.price)
                                             )}
                                         </TableCell>
-                                        <TableCell>{product.total_units}</TableCell>
+                                        <TableCell>{formatCount(product.total_units)}</TableCell>
                                         <TableCell>
                                             {isEditing ? (
                                                 <Stack direction="row" spacing={1}>
@@ -210,7 +211,7 @@ export default function ProductsGrid({
                                                     />
                                                 </Stack>
                                             ) : (
-                                                `${product.min_stock} / ${product.max_stock}`
+                                                `${formatCount(product.min_stock)} / ${formatCount(product.max_stock)}`
                                             )}
                                         </TableCell>
                                         <TableCell>

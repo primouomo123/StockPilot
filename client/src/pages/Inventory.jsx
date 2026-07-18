@@ -27,6 +27,12 @@ const EMPTY_PRODUCT_FORM = {
     categoryName: "",
 };
 
+function formatCount(value) {
+    const number = Number(value ?? 0);
+    if (Number.isNaN(number)) return value;
+    return number.toLocaleString();
+}
+
 export default function Inventory() {
     const {
         products,
@@ -77,7 +83,7 @@ export default function Inventory() {
     const pageLabel = useMemo(() => {
         const total = totalProducts;
         if (total === 0) return "No products found";
-        return `Page ${productPagination.page} of ${totalPages} (${total} total)`;
+        return `Page ${productPagination.page} of ${totalPages} (${formatCount(total)} total)`;
     }, [productPagination, totalPages, totalProducts]);
 
     const categoryOptions = useMemo(
@@ -214,7 +220,12 @@ export default function Inventory() {
     const formatPrice = (value) => {
         const number = Number(value);
         if (Number.isNaN(number)) return value;
-        return `$${number.toFixed(2)}`;
+        return number.toLocaleString("en-US", {
+            style: "currency",
+            currency: "USD",
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        });
     };
 
     return (
@@ -242,7 +253,7 @@ export default function Inventory() {
                         </Typography>
                     </Box>
                     <Stack direction="row" spacing={1}>
-                        <Chip label={`${totalProducts} total`} color="primary" variant="outlined" />
+                        <Chip label={`${formatCount(totalProducts)} total`} color="primary" variant="outlined" />
                         {isFiltered && (
                             <Chip
                                 label={
@@ -305,6 +316,7 @@ export default function Inventory() {
                 onDelete={handleDelete}
                 categoryOptions={categoryOptions}
                 formatPrice={formatPrice}
+                formatCount={formatCount}
                 pageLabel={pageLabel}
                 page={page}
                 totalPages={totalPages}

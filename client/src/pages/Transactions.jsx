@@ -25,6 +25,12 @@ const EMPTY_TRANSACTION_FORM = {
     quantityChange: "",
 };
 
+function formatCount(value) {
+    const number = Number(value ?? 0);
+    if (Number.isNaN(number)) return value;
+    return number.toLocaleString();
+}
+
 export default function Transactions() {
     const {
         transactions,
@@ -71,7 +77,7 @@ export default function Transactions() {
     const pageLabel = useMemo(() => {
         const total = totalTransactions;
         if (total === 0) return "No transactions found";
-        return `Page ${transactionPagination.page} of ${totalPages} (${total} total)`;
+        return `Page ${transactionPagination.page} of ${totalPages} (${formatCount(total)} total)`;
     }, [transactionPagination, totalPages, totalTransactions]);
 
     const productOptions = useMemo(() => {
@@ -160,10 +166,11 @@ export default function Transactions() {
     };
 
     const formatQuantity = (type, quantity) => {
+        const formattedQuantity = formatCount(Math.abs(quantity));
         if (type === "Stock Out") {
-            return `-${Math.abs(quantity)}`;
+            return `-${formattedQuantity}`;
         }
-        return `+${Math.abs(quantity)}`;
+        return `+${formattedQuantity}`;
     };
 
     return (
@@ -191,7 +198,7 @@ export default function Transactions() {
                         </Typography>
                     </Box>
                     <Stack direction="row" spacing={1}>
-                        <Chip label={`${totalTransactions} total`} color="primary" variant="outlined" />
+                        <Chip label={`${formatCount(totalTransactions)} total`} color="primary" variant="outlined" />
                         {hasDateFilter && (
                             <Chip
                                 label={
