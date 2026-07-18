@@ -255,7 +255,16 @@ export default function Dashboard() {
 
     return (
         <Stack spacing={3}>
-            <Paper sx={{ p: { xs: 2.25, md: 3 }, border: 1, borderColor: "divider", borderRadius: 2 }}>
+            <Paper
+                elevation={0}
+                sx={{
+                    p: { xs: 2.25, md: 3 },
+                    border: 1,
+                    borderColor: "divider",
+                    borderRadius: 2,
+                    background: "linear-gradient(135deg, rgba(2,136,209,0.10) 0%, rgba(255,255,255,1) 65%)",
+                }}
+            >
                 <Stack spacing={2}>
                     <Stack
                         direction={{ xs: "column", sm: "row" }}

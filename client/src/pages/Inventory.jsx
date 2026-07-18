@@ -5,6 +5,9 @@
 import { useEffect, useMemo, useState } from "react";
 import {
     Alert,
+    Box,
+    Chip,
+    Paper,
     Stack,
     Typography,
 } from "@mui/material";
@@ -68,11 +71,14 @@ export default function Inventory() {
     }, [categories.length, getCategories]);
 
     const totalPages = productPagination?.totalPages || 1;
+    const totalProducts = productPagination?.total ?? 0;
+    const isFiltered = Boolean(searchNameQuery || searchSkuQuery);
+
     const pageLabel = useMemo(() => {
-        const total = productPagination?.total ?? 0;
+        const total = totalProducts;
         if (total === 0) return "No products found";
         return `Page ${productPagination.page} of ${totalPages} (${total} total)`;
-    }, [productPagination, totalPages]);
+    }, [productPagination, totalPages, totalProducts]);
 
     const categoryOptions = useMemo(
         () => categories.map((category) => category.name).sort((a, b) => a.localeCompare(b)),
@@ -213,12 +219,44 @@ export default function Inventory() {
 
     return (
         <Stack spacing={3}>
-            <Stack spacing={0.5}>
-                <Typography variant="h4">Inventory</Typography>
-                <Typography color="text.secondary">
-                    Track products, pricing, category assignment, and stock limits.
-                </Typography>
-            </Stack>
+            <Paper
+                elevation={0}
+                sx={{
+                    p: { xs: 2, md: 3 },
+                    border: 1,
+                    borderColor: "divider",
+                    background: "linear-gradient(135deg, rgba(2,136,209,0.10) 0%, rgba(255,255,255,1) 65%)",
+                }}
+            >
+                <Stack
+                    direction={{ xs: "column", md: "row" }}
+                    spacing={1.5}
+                    alignItems={{ xs: "flex-start", md: "center" }}
+                    justifyContent="space-between"
+                >
+                    <Box>
+                        <Typography variant="h4">Inventory Management</Typography>
+                        <Typography color="text.secondary">
+                            Track products, pricing, category assignment, and stock limits.
+                        </Typography>
+                    </Box>
+                    <Stack direction="row" spacing={1}>
+                        <Chip label={`${totalProducts} total`} color="primary" variant="outlined" />
+                        {isFiltered && (
+                            <Chip
+                                label={
+                                    searchNameQuery && searchSkuQuery
+                                        ? `Name: ${searchNameQuery} | SKU: ${searchSkuQuery}`
+                                        : searchNameQuery
+                                          ? `Name: ${searchNameQuery}`
+                                          : `SKU: ${searchSkuQuery}`
+                                }
+                                variant="outlined"
+                            />
+                        )}
+                    </Stack>
+                </Stack>
+            </Paper>
 
             {(localError || productsError) && (
                 <Alert severity="error">{localError || productsError}</Alert>

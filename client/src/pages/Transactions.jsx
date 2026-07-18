@@ -4,6 +4,9 @@
 import { useEffect, useMemo, useState } from "react";
 import {
     Alert,
+    Box,
+    Chip,
+    Paper,
     Stack,
     Typography,
 } from "@mui/material";
@@ -62,12 +65,14 @@ export default function Transactions() {
     }, [getProducts, products.length]);
 
     const totalPages = transactionPagination?.totalPages || 1;
+    const totalTransactions = transactionPagination?.total ?? 0;
+    const hasDateFilter = Boolean(startDateQuery || endDateQuery);
 
     const pageLabel = useMemo(() => {
-        const total = transactionPagination?.total ?? 0;
+        const total = totalTransactions;
         if (total === 0) return "No transactions found";
         return `Page ${transactionPagination.page} of ${totalPages} (${total} total)`;
-    }, [transactionPagination, totalPages]);
+    }, [transactionPagination, totalPages, totalTransactions]);
 
     const productOptions = useMemo(() => {
         const names = new Set(products.map((product) => product.name).filter(Boolean));
@@ -163,12 +168,44 @@ export default function Transactions() {
 
     return (
         <Stack spacing={3}>
-            <Stack spacing={0.5}>
-                <Typography variant="h4">Transactions</Typography>
-                <Typography color="text.secondary">
-                    Record stock in and stock out activity, then filter by date range.
-                </Typography>
-            </Stack>
+            <Paper
+                elevation={0}
+                sx={{
+                    p: { xs: 2, md: 3 },
+                    border: 1,
+                    borderColor: "divider",
+                    background: "linear-gradient(135deg, rgba(2,136,209,0.10) 0%, rgba(255,255,255,1) 65%)",
+                }}
+            >
+                <Stack
+                    direction={{ xs: "column", md: "row" }}
+                    spacing={1.5}
+                    alignItems={{ xs: "flex-start", md: "center" }}
+                    justifyContent="space-between"
+                >
+                    <Box>
+                        <Typography variant="h4">Transaction Activity</Typography>
+                        <Typography color="text.secondary">
+                            Record stock in and stock out activity, then filter by date range.
+                        </Typography>
+                    </Box>
+                    <Stack direction="row" spacing={1}>
+                        <Chip label={`${totalTransactions} total`} color="primary" variant="outlined" />
+                        {hasDateFilter && (
+                            <Chip
+                                label={
+                                    startDateQuery && endDateQuery
+                                        ? `${startDateQuery} to ${endDateQuery}`
+                                        : startDateQuery
+                                          ? `From ${startDateQuery}`
+                                          : `Through ${endDateQuery}`
+                                }
+                                variant="outlined"
+                            />
+                        )}
+                    </Stack>
+                </Stack>
+            </Paper>
 
             {(localError || transactionsError) && (
                 <Alert severity="error">{localError || transactionsError}</Alert>
