@@ -410,12 +410,21 @@ export default function Dashboard() {
                 />
             </Box>
 
-            <Stack direction="row" alignItems="center" justifyContent="space-between">
-                <Typography variant="h6">Stock Alerts</Typography>
-                <Typography variant="body2" color="text.secondary">
-                    Products that need attention
-                </Typography>
-            </Stack>
+            <Paper
+                variant="outlined"
+                sx={{
+                    px: { xs: 2, md: 2.5 },
+                    py: { xs: 1.5, md: 1.75 },
+                    borderRadius: 2,
+                }}
+            >
+                <Stack spacing={0.5}>
+                    <Typography variant="h6">Stock Alerts</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                        Products that need attention
+                    </Typography>
+                </Stack>
+            </Paper>
 
             <Box
                 sx={{
